@@ -38,3 +38,6 @@ logs/
 *.db
 .pytype/
 .idea/
+
+# claude
+.claude/*.local.json
