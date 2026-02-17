@@ -36,12 +36,13 @@ def handle_message_im(client: WebClient, event: dict, logger: Logger, say: Say):
         thread_ts = event.get("thread_ts") or event["ts"]
         user_id = event["user"]
 
-        # Add eyes reaction
-        client.reactions_add(
-            channel=channel_id,
-            timestamp=event["ts"],
-            name="eyes",
-        )
+        # Add eyes reaction only to the first message (not threaded replies)
+        if not event.get("thread_ts"):
+            client.reactions_add(
+                channel=channel_id,
+                timestamp=event["ts"],
+                name="eyes",
+            )
 
         # Get conversation history
         history = conversation_store.get_history(channel_id, thread_ts)

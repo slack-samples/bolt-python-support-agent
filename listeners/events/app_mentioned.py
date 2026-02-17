@@ -39,12 +39,13 @@ def handle_app_mentioned(client: WebClient, event: dict, logger: Logger, say: Sa
             )
             return
 
-        # Add eyes reaction
-        client.reactions_add(
-            channel=channel_id,
-            timestamp=event["ts"],
-            name="eyes",
-        )
+        # Add eyes reaction only to the first message (not threaded replies)
+        if not event.get("thread_ts"):
+            client.reactions_add(
+                channel=channel_id,
+                timestamp=event["ts"],
+                name="eyes",
+            )
 
         # Get conversation history
         history = conversation_store.get_history(channel_id, thread_ts)
