@@ -62,7 +62,7 @@ def handle_message_im(client: WebClient, event: dict, logger: Logger, say: Say):
         )
 
         # Post response in thread with feedback buttons
-        feedback_blocks = create_feedback_block(thread_ts)
+        feedback_blocks = create_feedback_block()
         response_blocks = [
             {
                 "type": "section",
