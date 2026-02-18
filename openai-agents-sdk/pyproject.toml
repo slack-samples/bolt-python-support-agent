@@ -1,0 +1,31 @@
+[project]
+name = "bolt-python-support-agent-openai-agentkit"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "slack-sdk==3.40.0",
+    "slack-bolt==1.27.0",
+    "slack-cli-hooks<1.0.0",
+    "openai-agents",
+    "python-dotenv==1.2.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "ruff==0.14.7",
+]
+
+[tool.setuptools.packages.find]
+include = ["agent*", "listeners*", "conversation*"]
+
+[tool.ruff]
+[tool.ruff.lint]
+[tool.ruff.format]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+log_file = "logs/pytest.log"
+log_file_level = "DEBUG"
+log_format = "%(asctime)s %(levelname)s %(message)s"
+log_date_format = "%Y-%m-%d %H:%M:%S"

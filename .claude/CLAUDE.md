@@ -4,9 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-Casey is an AI-powered IT helpdesk agent for Slack, built with Bolt for Python and Pydantic AI. It uses simulated tools (knowledge base, ticket creation, password reset, system status, permissions lookup) to demonstrate an agentic IT support workflow. All tool data is hardcoded for demo purposes.
+A monorepo containing two parallel implementations of **Casey**, an AI-powered IT helpdesk agent for Slack built with Bolt for Python. Both implementations are functionally identical from the Slack user's perspective but use different AI agent frameworks:
+
+- `pydantic-ai/` — Built with **Pydantic AI**
+- `openai-agents-sdk/` — Built with **OpenAI Agents SDK**
+
+All tool data (knowledge base, tickets, password resets, system status, permissions) is hardcoded for demo purposes.
 
 ## Commands
+
+All commands must be run from within the respective project directory (`pydantic-ai/` or `openai-agents-sdk/`).
 
 ```sh
 # Run the app (requires .env with OPENAI_API_KEY; Slack tokens optional with CLI)
@@ -21,7 +28,17 @@ ruff format --check .
 pytest
 ```
 
-## Architecture
+## Monorepo Structure
+
+```
+.github/              # Shared CI workflows and dependabot config
+pydantic-ai/         # Pydantic AI implementation
+openai-agents-sdk/   # OpenAI Agents SDK implementation
+```
+
+CI runs ruff lint/format checks against both directories via a matrix strategy in `.github/workflows/ruff.yml`. Dependabot monitors `requirements.txt` in both directories independently.
+
+## Architecture (shared across both implementations)
 
 Three-layer design: **app.py** → **listeners/** → **agent/**
 
@@ -29,20 +46,28 @@ Three-layer design: **app.py** → **listeners/** → **agent/**
 
 **Listeners** are organized by Slack platform feature:
 - `listeners/events/` — `app_home_opened`, `app_mentioned`, `message_im`
-- `listeners/actions/` — `category_buttons` (regex `^category_`), `feedback_good`, `feedback_bad`
+- `listeners/actions/` — `category_buttons` (regex `^category_`), feedback handlers
 - `listeners/views/` — `issue_submission` modal handler
 
 Each sub-package has a `register(app)` function called from `listeners/__init__.py`.
 
-**Agent (`agent/casey.py`)** is a Pydantic AI `Agent` with `deps_type=CaseyDeps`. The model is **not** set on the agent (to avoid import-time OpenAI client creation); instead `DEFAULT_MODEL` (`openai:gpt-4o-mini`) is passed at each `run_sync()` call site. Tools are passed via the `tools=[]` constructor parameter (not decorators) so each tool lives in its own file under `agent/tools/`.
+**CaseyDeps** (`agent/deps.py`) is a dataclass carrying `client`, `user_id`, `channel_id`, `thread_ts`. Constructed in each listener handler and passed to the agent at runtime.
 
-**CaseyDeps** (`agent/deps.py`) is a dataclass carrying `client`, `user_id`, `channel_id`, `thread_ts`. It's constructed in each listener handler and passed as `deps=` to `run_sync()`.
+**Conversation history** (`conversation/store.py`) is a thread-safe in-memory dict keyed by `(channel_id, thread_ts)` with TTL-based cleanup. This enables multi-turn context.
 
-**Conversation history** (`conversation/store.py`) is an in-memory dict keyed by `(channel_id, thread_ts)` storing `list[ModelMessage]` from Pydantic AI. This is what enables multi-turn context. The singleton `conversation_store` is imported from `conversation/`.
+**Handler flow** (DM, mention, modal submit): add `:eyes:` reaction → get history from store → run agent → post response in thread with feedback blocks → store updated messages.
 
-## Key Patterns
+## Key Differences Between Implementations
 
-- All three message handlers (DM, mention, modal submit) follow the same flow: add :eyes: reaction → get history from store → `casey_agent.run_sync(text, model=DEFAULT_MODEL, deps=deps, message_history=history)` → post `result.output` in thread with feedback blocks → store `result.all_messages()`.
-- Emoji/reaction logic is in the handlers, not the agent. Resolution detection checks `result.output` against a hardcoded phrase list.
-- View builders (`app_home_builder.py`, `modal_builder.py`, `feedback_block.py`) return raw dicts or Block Kit objects, not views themselves. The handlers call `client.views_publish()` or `client.views_open()`.
-- The `message_im` handler filters out bot messages (`event.bot_id`) and subtypes to avoid self-reply loops.
+| Aspect | Pydantic AI | OpenAI Agents SDK |
+|--------|-------------|-------------------|
+| Agent file | `agent/casey.py` | `agent/support_agent.py` |
+| Agent definition | `Agent(deps_type=CaseyDeps)` | `Agent[CaseyDeps](model="gpt-4o-mini")` |
+| Model config | Passed at runtime via `run_sync(model=DEFAULT_MODEL)` | Set directly on agent constructor |
+| Tool definition | Plain async functions | `@function_tool` decorated functions |
+| Tool context param | `RunContext[CaseyDeps]` | `RunContextWrapper[CaseyDeps]` |
+| Execution | `casey_agent.run_sync(text, model=..., deps=..., message_history=...)` | `Runner.run_sync(casey_agent, input=..., context=...)` |
+| Result output | `result.output` | `result.final_output` |
+| Result messages | `result.all_messages()` | `result.to_input_list()` |
+| History type | `list[ModelMessage]` (framework-native) | `list` (generic, manually constructed) |
+| Feedback blocks | Native `FeedbackButtonsElement` | Native `FeedbackButtonsElement` |
