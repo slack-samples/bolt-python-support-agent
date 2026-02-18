@@ -1,6 +1,6 @@
 # Casey: IT Helpdesk Agent (Bolt for Python and Pydantic)
 
-Meet Casey — an AI-powered IT helpdesk agent that lives in Slack. Casey can troubleshoot common issues, search knowledge base articles, reset passwords, check system status, and create support tickets, all without leaving the conversation.
+Meet Casey (they/them) — an AI-powered IT helpdesk agent that lives in Slack. Casey can troubleshoot common issues, search knowledge base articles, reset passwords, check system status, and create support tickets, all without leaving the conversation.
 
 Built with [Bolt for Python](https://docs.slack.dev/tools/bolt-python/) and [Pydantic AI](https://ai.pydantic.dev/) using models from [OpenAI](https://openai.com).
 
