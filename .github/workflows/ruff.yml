@@ -11,7 +11,9 @@ jobs:
     timeout-minutes: 5
     strategy:
       matrix:
-        directory: [openai-agents-sdk, pydantic-ai]
+        directory:
+          - openai-agents-sdk
+          - pydantic-ai
     defaults:
       run:
         working-directory: ${{ matrix.directory }}
