@@ -23,7 +23,8 @@
         "im:write",
         "reactions:write",
         "reactions:read",
-        "users:read"
+        "users:read",
+        "assistant:write"
       ]
     }
   },
