@@ -1,6 +1,6 @@
 {
   "display_information": {
-    "name": "Casey OpenAI AgentKit"
+    "name": "Casey - OpenAI SDK"
   },
   "features": {
     "app_home": {
@@ -9,7 +9,7 @@
       "messages_tab_read_only_enabled": false
     },
     "bot_user": {
-      "display_name": "Casey OpenAI AgentKit",
+      "display_name": "Casey - OpenAI SDK",
       "always_online": false
     }
   },
