@@ -122,7 +122,7 @@ async def search_knowledge_base(
     results = []
     for article in matches:
         results.append(
-            f"*{article['title']}* ({article['article_id']})\n{article['content']}"
+            f"**{article['title']}** ({article['article_id']})\n{article['content']}"
         )
 
     return "\n\n---\n\n".join(results)

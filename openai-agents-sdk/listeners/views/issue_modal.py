@@ -67,11 +67,8 @@ def handle_issue_submission(ack: Ack, body: dict, client: WebClient, logger: Log
         feedback_blocks = create_feedback_block()
         response_blocks = [
             {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": result.final_output,
-                },
+                "type": "markdown",
+                "text": result.final_output,
             },
             *feedback_blocks,
         ]

@@ -18,7 +18,7 @@ async def trigger_password_reset(
         target_user: The username or email of the user whose password should be reset.
     """
     return (
-        f"Password reset initiated for *{target_user}*.\n\n"
+        f"Password reset initiated for **{target_user}**.\n\n"
         f"A reset link has been sent to the email address on file. "
         f"The link will expire in 30 minutes.\n\n"
         f"_If the user doesn't receive the email within 5 minutes, "

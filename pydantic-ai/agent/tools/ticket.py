@@ -28,11 +28,11 @@ async def create_support_ticket(
 
     return (
         f"Support ticket created successfully.\n"
-        f"*Ticket ID:* {ticket_id}\n"
-        f"*Title:* {title}\n"
-        f"*Priority:* {priority}\n"
-        f"*Category:* {category}\n"
-        f"*Status:* Open\n"
-        f"*Assigned to:* IT Support Queue\n\n"
+        f"**Ticket ID:** {ticket_id}\n"
+        f"**Title:** {title}\n"
+        f"**Priority:** {priority}\n"
+        f"**Category:** {category}\n"
+        f"**Status:** Open\n"
+        f"**Assigned to:** IT Support Queue\n\n"
         f"The IT team will review this ticket and follow up within the SLA for {priority} priority issues."
     )

@@ -81,11 +81,8 @@ def handle_message_im(client: WebClient, event: dict, logger: Logger, say: Say):
         feedback_blocks = create_feedback_block()
         response_blocks = [
             {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": result.final_output,
-                },
+                "type": "markdown",
+                "text": result.final_output,
             },
             *feedback_blocks,
         ]

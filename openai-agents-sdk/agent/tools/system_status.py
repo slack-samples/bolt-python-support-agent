@@ -76,7 +76,7 @@ async def check_system_status(
             }.get(info["status"], ":white_circle:")
 
             return (
-                f"*{info['name']}* {status_emoji} `{info['status'].upper()}`\n"
+                f"**{info['name']}** {status_emoji} `{info['status'].upper()}`\n"
                 f"{info['details']}"
             )
 
