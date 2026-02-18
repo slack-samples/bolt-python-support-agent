@@ -1,6 +1,6 @@
 {
   "display_information": {
-    "name": "Casey"
+    "name": "Casey - Pydantic AI"
   },
   "features": {
     "app_home": {
@@ -9,7 +9,7 @@
       "messages_tab_read_only_enabled": false
     },
     "bot_user": {
-      "display_name": "Casey",
+      "display_name": "Casey - Pydantic AI",
       "always_online": false
     }
   },
