@@ -1,13 +1,16 @@
 version: 2
 updates:
   - package-ecosystem: "pip"
-    directory: "/"
+    directories:
+      - "/"
+      - "/openai-agents-sdk"
+      - "/pydantic-ai"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     labels:
       - "pip"
       - "dependencies"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
