@@ -50,7 +50,7 @@ def handle_issue_submission(ack: Ack, body: dict, client: WebClient, logger: Log
         result = Runner.run_sync(casey_agent, input=user_message, context=deps)
 
         # Post the response in thread with feedback buttons
-        feedback_blocks = create_feedback_block(thread_ts)
+        feedback_blocks = create_feedback_block()
         response_blocks = [
             {
                 "type": "section",

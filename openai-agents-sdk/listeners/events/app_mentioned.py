@@ -66,7 +66,7 @@ def handle_app_mentioned(client: WebClient, event: dict, logger: Logger, say: Sa
         result = Runner.run_sync(casey_agent, input=input_items, context=deps)
 
         # Post response in thread with feedback buttons
-        feedback_blocks = create_feedback_block(thread_ts)
+        feedback_blocks = create_feedback_block()
         response_blocks = [
             {
                 "type": "section",

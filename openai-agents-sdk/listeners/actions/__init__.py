@@ -8,5 +8,4 @@ from .feedback import handle_feedback
 
 def register(app: App):
     app.action(re.compile(r"^category_"))(handle_category_button)
-    app.action("feedback_good")(handle_feedback)
-    app.action("feedback_bad")(handle_feedback)
+    app.action("feedback")(handle_feedback)

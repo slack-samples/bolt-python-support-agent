@@ -10,6 +10,6 @@ See the root `../.claude/CLAUDE.md` for monorepo-wide architecture, commands, an
 
 **Conversation history** is stored as a generic `list` and must be manually combined with new user input before passing to `Runner.run_sync()`: `input_items = history + [{"role": "user", "content": text}]`. After execution, `result.to_input_list()` is stored back.
 
-**Feedback blocks** use custom `ButtonElement` pairs inside an `ActionsBlock`, with separate `feedback_good` and `feedback_bad` action IDs. The `create_feedback_block(thread_ts)` function takes a timestamp to generate a unique `block_id`.
+**Feedback blocks** use the native `FeedbackButtonsElement` from `slack_sdk.models.blocks`. A single `feedback` action ID is registered.
 
 The `message_im` handler adds the `:eyes:` reaction on every message (including thread replies).

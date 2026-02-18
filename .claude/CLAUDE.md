@@ -70,4 +70,4 @@ Each sub-package has a `register(app)` function called from `listeners/__init__.
 | Result output | `result.output` | `result.final_output` |
 | Result messages | `result.all_messages()` | `result.to_input_list()` |
 | History type | `list[ModelMessage]` (framework-native) | `list` (generic, manually constructed) |
-| Feedback blocks | Native `FeedbackButtonsElement` | Custom `ButtonElement` pair |
+| Feedback blocks | Native `FeedbackButtonsElement` | Native `FeedbackButtonsElement` |

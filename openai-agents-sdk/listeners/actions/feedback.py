@@ -14,7 +14,7 @@ def handle_feedback(ack: Ack, body: dict, client: WebClient, logger: Logger):
         message_ts = body["message"]["ts"]
         feedback_value = body["actions"][0]["value"]
 
-        if feedback_value == "good":
+        if feedback_value == "good-feedback":
             client.chat_postEphemeral(
                 channel=channel_id,
                 user=user_id,
