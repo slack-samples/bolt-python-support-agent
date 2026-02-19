@@ -27,8 +27,10 @@ async def handle_app_mentioned(
     """Handle @Casey mentions in channels."""
     try:
         channel_id = event["channel"]
+        team_id = event.get("team")
         text = event.get("text", "")
         thread_ts = event.get("thread_ts") or event["ts"]
+        user_id = event.get("user")
 
         # Strip the bot mention from the text
         cleaned_text = re.sub(r"<@[A-Z0-9]+>", "", text).strip()
@@ -70,21 +72,16 @@ async def handle_app_mentioned(
             cleaned_text, session_id=existing_session_id
         )
 
-        # Post response in thread with feedback buttons
-        feedback_blocks = create_feedback_block()
-        response_blocks = [
-            {
-                "type": "markdown",
-                "text": response_text,
-            },
-            *feedback_blocks,
-        ]
-        await client.chat_postMessage(
+        # Stream response in thread with feedback buttons
+        streamer = await client.chat_stream(
             channel=channel_id,
+            recipient_team_id=team_id,
+            recipient_user_id=user_id,
             thread_ts=thread_ts,
-            text=response_text,
-            blocks=response_blocks,
         )
+        await streamer.append(markdown_text=response_text)
+        feedback_blocks = create_feedback_block()
+        await streamer.stop(blocks=feedback_blocks)
 
         # Store session ID for future context
         if new_session_id:

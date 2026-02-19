@@ -15,6 +15,7 @@ async def handle_issue_submission(
     await ack()
 
     try:
+        team_id = body["user"]["team_id"]
         user_id = body["user"]["id"]
         values = body["view"]["state"]["values"]
         category = values["category_block"]["category_select"]["selected_option"][
@@ -58,21 +59,16 @@ async def handle_issue_submission(
         # Run the agent
         response_text, new_session_id = await run_casey_agent(user_message)
 
-        # Post the response in thread with feedback buttons
-        feedback_blocks = create_feedback_block()
-        response_blocks = [
-            {
-                "type": "markdown",
-                "text": response_text,
-            },
-            *feedback_blocks,
-        ]
-        await client.chat_postMessage(
+        # Stream the response in thread with feedback buttons
+        streamer = await client.chat_stream(
             channel=channel_id,
+            recipient_team_id=team_id,
+            recipient_user_id=user_id,
             thread_ts=thread_ts,
-            text=response_text,
-            blocks=response_blocks,
         )
+        await streamer.append(markdown_text=response_text)
+        feedback_blocks = create_feedback_block()
+        await streamer.stop(blocks=feedback_blocks)
 
         # Store session ID for future context
         if new_session_id:

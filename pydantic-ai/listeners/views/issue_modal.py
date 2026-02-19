@@ -13,6 +13,7 @@ def handle_issue_submission(ack: Ack, body: dict, client: WebClient, logger: Log
     ack()
 
     try:
+        team_id = body["user"]["team_id"]
         user_id = body["user"]["id"]
         values = body["view"]["state"]["values"]
         category = values["category_block"]["category_select"]["selected_option"][
@@ -62,21 +63,16 @@ def handle_issue_submission(ack: Ack, body: dict, client: WebClient, logger: Log
         )
         result = casey_agent.run_sync(user_message, model=DEFAULT_MODEL, deps=deps)
 
-        # Post the response in thread with feedback buttons
-        feedback_blocks = create_feedback_block()
-        response_blocks = [
-            {
-                "type": "markdown",
-                "text": result.output,
-            },
-            *feedback_blocks,
-        ]
-        client.chat_postMessage(
+        # Stream the response in thread with feedback buttons
+        streamer = client.chat_stream(
             channel=channel_id,
+            recipient_team_id=team_id,
+            recipient_user_id=user_id,
             thread_ts=thread_ts,
-            text=result.output,
-            blocks=response_blocks,
         )
+        streamer.append(markdown_text=result.output)
+        feedback_blocks = create_feedback_block()
+        streamer.stop(blocks=feedback_blocks)
 
         # Store conversation history
         conversation_store.set_history(channel_id, thread_ts, result.all_messages())

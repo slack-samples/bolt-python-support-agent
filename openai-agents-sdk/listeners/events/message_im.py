@@ -33,6 +33,7 @@ def handle_message_im(client: WebClient, event: dict, logger: Logger, say: Say):
 
     try:
         channel_id = event["channel"]
+        team_id = event.get("team")
         text = event.get("text", "")
         thread_ts = event.get("thread_ts") or event["ts"]
         user_id = event["user"]
@@ -77,21 +78,16 @@ def handle_message_im(client: WebClient, event: dict, logger: Logger, say: Say):
         )
         result = Runner.run_sync(casey_agent, input=input_items, context=deps)
 
-        # Post response in thread with feedback buttons
-        feedback_blocks = create_feedback_block()
-        response_blocks = [
-            {
-                "type": "markdown",
-                "text": result.final_output,
-            },
-            *feedback_blocks,
-        ]
-        client.chat_postMessage(
+        # Stream response in thread with feedback buttons
+        streamer = client.chat_stream(
             channel=channel_id,
+            recipient_team_id=team_id,
+            recipient_user_id=user_id,
             thread_ts=thread_ts,
-            text=result.final_output,
-            blocks=response_blocks,
         )
+        streamer.append(markdown_text=result.final_output)
+        feedback_blocks = create_feedback_block()
+        streamer.stop(blocks=feedback_blocks)
 
         # Store conversation history
         conversation_store.set_history(channel_id, thread_ts, result.to_input_list())
