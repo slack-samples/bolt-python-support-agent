@@ -39,6 +39,20 @@ def handle_app_mentioned(client: WebClient, event: dict, logger: Logger, say: Sa
             )
             return
 
+        # Set assistant thread status with loading messages
+        client.assistant_threads_setStatus(
+            channel_id=channel_id,
+            thread_ts=thread_ts,
+            status="Thinking...",
+            loading_messages=[
+                "Teaching the hamsters to type faster…",
+                "Untangling the internet cables…",
+                "Consulting the office goldfish…",
+                "Polishing up the response just for you…",
+                "Convincing the AI to stop overthinking…",
+            ],
+        )
+
         # Add eyes reaction only to the first message (not threaded replies)
         if not event.get("thread_ts"):
             client.reactions_add(
@@ -68,11 +82,8 @@ def handle_app_mentioned(client: WebClient, event: dict, logger: Logger, say: Sa
         feedback_blocks = create_feedback_block()
         response_blocks = [
             {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": result.output,
-                },
+                "type": "markdown",
+                "text": result.output,
             },
             *feedback_blocks,
         ]

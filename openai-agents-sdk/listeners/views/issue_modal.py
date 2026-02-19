@@ -33,6 +33,20 @@ def handle_issue_submission(ack: Ack, body: dict, client: WebClient, logger: Log
         )
         thread_ts = initial["ts"]
 
+        # Set assistant thread status with loading messages
+        client.assistant_threads_setStatus(
+            channel_id=channel_id,
+            thread_ts=thread_ts,
+            status="Thinking...",
+            loading_messages=[
+                "Teaching the hamsters to type faster…",
+                "Untangling the internet cables…",
+                "Consulting the office goldfish…",
+                "Polishing up the response just for you…",
+                "Convincing the AI to stop overthinking…",
+            ],
+        )
+
         # Add eyes reaction
         client.reactions_add(
             channel=channel_id,
@@ -53,11 +67,8 @@ def handle_issue_submission(ack: Ack, body: dict, client: WebClient, logger: Log
         feedback_blocks = create_feedback_block()
         response_blocks = [
             {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": result.final_output,
-                },
+                "type": "markdown",
+                "text": result.final_output,
             },
             *feedback_blocks,
         ]

@@ -73,7 +73,7 @@ async def check_system_status(ctx: RunContext[CaseyDeps], system_name: str) -> s
             }.get(info["status"], ":white_circle:")
 
             return (
-                f"*{info['name']}* {status_emoji} `{info['status'].upper()}`\n"
+                f"**{info['name']}** {status_emoji} `{info['status'].upper()}`\n"
                 f"{info['details']}"
             )
 

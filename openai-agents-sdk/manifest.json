@@ -3,6 +3,10 @@
     "name": "Casey - OpenAI SDK"
   },
   "features": {
+    "assistant_view": {
+      "assistant_description": "Hi, I am an agent built using Bolt for Python. I am here to help you out!",
+      "suggested_prompts": []
+    },
     "app_home": {
       "home_tab_enabled": true,
       "messages_tab_enabled": true,
@@ -23,7 +27,8 @@
         "im:write",
         "reactions:write",
         "reactions:read",
-        "users:read"
+        "users:read",
+        "assistant:write"
       ]
     }
   },
@@ -32,6 +37,7 @@
       "bot_events": [
         "app_home_opened",
         "app_mention",
+        "assistant_thread_started",
         "message.im"
       ]
     },
