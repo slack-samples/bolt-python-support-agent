@@ -4,19 +4,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-A monorepo containing two parallel implementations of **Casey**, an AI-powered IT helpdesk agent for Slack built with Bolt for Python. Both implementations are functionally identical from the Slack user's perspective but use different AI agent frameworks:
+A monorepo containing three parallel implementations of **Casey**, an AI-powered IT helpdesk agent for Slack built with Bolt for Python. All implementations are functionally identical from the Slack user's perspective but use different AI agent frameworks:
 
 - `pydantic-ai/` — Built with **Pydantic AI**
 - `openai-agents-sdk/` — Built with **OpenAI Agents SDK**
+- `claude-agent-sdk/` — Built with **Claude Agent SDK**
 
 All tool data (knowledge base, tickets, password resets, system status, permissions) is hardcoded for demo purposes.
 
 ## Commands
 
-All commands must be run from within the respective project directory (`pydantic-ai/` or `openai-agents-sdk/`).
+All commands must be run from within the respective project directory (`pydantic-ai/`, `openai-agents-sdk/`, or `claude-agent-sdk/`).
 
 ```sh
-# Run the app (requires .env with OPENAI_API_KEY; Slack tokens optional with CLI)
+# Run the app (requires .env with OPENAI_API_KEY or ANTHROPIC_API_KEY; Slack tokens optional with CLI)
 slack run          # via Slack CLI
 python3 app.py     # directly
 
@@ -34,9 +35,10 @@ pytest
 .github/              # Shared CI workflows and dependabot config
 pydantic-ai/         # Pydantic AI implementation
 openai-agents-sdk/   # OpenAI Agents SDK implementation
+claude-agent-sdk/    # Claude Agent SDK implementation
 ```
 
-CI runs ruff lint/format checks against both directories via a matrix strategy in `.github/workflows/ruff.yml`. Dependabot monitors `requirements.txt` in both directories independently.
+CI runs ruff lint/format checks against all directories via a matrix strategy in `.github/workflows/ruff.yml`. Dependabot monitors `requirements.txt` in all directories independently.
 
 ## Architecture (shared across both implementations)
 
@@ -59,15 +61,16 @@ Each sub-package has a `register(app)` function called from `listeners/__init__.
 
 ## Key Differences Between Implementations
 
-| Aspect | Pydantic AI | OpenAI Agents SDK |
-|--------|-------------|-------------------|
-| Agent file | `agent/casey.py` | `agent/support_agent.py` |
-| Agent definition | `Agent(deps_type=CaseyDeps)` | `Agent[CaseyDeps](model="gpt-4o-mini")` |
-| Model config | Passed at runtime via `run_sync(model=DEFAULT_MODEL)` | Set directly on agent constructor |
-| Tool definition | Plain async functions | `@function_tool` decorated functions |
-| Tool context param | `RunContext[CaseyDeps]` | `RunContextWrapper[CaseyDeps]` |
-| Execution | `casey_agent.run_sync(text, model=..., deps=..., message_history=...)` | `Runner.run_sync(casey_agent, input=..., context=...)` |
-| Result output | `result.output` | `result.final_output` |
-| Result messages | `result.all_messages()` | `result.to_input_list()` |
-| History type | `list[ModelMessage]` (framework-native) | `list` (generic, manually constructed) |
-| Feedback blocks | Native `FeedbackButtonsElement` | Native `FeedbackButtonsElement` |
+| Aspect | Pydantic AI | OpenAI Agents SDK | Claude Agent SDK |
+|--------|-------------|-------------------|-----------------|
+| Agent file | `agent/casey.py` | `agent/support_agent.py` | `agent/casey.py` |
+| App type | `App` (sync) | `App` (sync) | `AsyncApp` (fully async) |
+| Agent definition | `Agent(deps_type=CaseyDeps)` | `Agent[CaseyDeps](model="gpt-4o-mini")` | `ClaudeSDKClient` with `ClaudeAgentOptions` |
+| Model config | Passed at runtime via `run_sync(model=DEFAULT_MODEL)` | Set directly on agent constructor | Managed by SDK (Claude models) |
+| Tool definition | Plain async functions | `@function_tool` decorated functions | `@tool` decorated functions via MCP server |
+| Tool context param | `RunContext[CaseyDeps]` | `RunContextWrapper[CaseyDeps]` | `args` dict (no context param) |
+| Execution | `casey_agent.run_sync(text, model=..., deps=..., message_history=...)` | `Runner.run_sync(casey_agent, input=..., context=...)` | `await run_casey_agent(text, session_id=...)` |
+| Result output | `result.output` | `result.final_output` | `response_text` from collected `TextBlock.text` |
+| Conversation history | `list[ModelMessage]` stored locally | `list` stored locally | Session-based via `resume` (server-side) |
+| API key env var | `OPENAI_API_KEY` | `OPENAI_API_KEY` | `ANTHROPIC_API_KEY` |
+| Feedback blocks | Native `FeedbackButtonsElement` | Native `FeedbackButtonsElement` | Native `FeedbackButtonsElement` |

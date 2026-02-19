@@ -6,14 +6,14 @@ Built with [Bolt for Python](https://docs.slack.dev/tools/bolt-python/).
 
 ## Choose Your Framework
 
-This repo contains the same app built with two different AI agent frameworks. Pick the one that fits your stack:
+This repo contains the same app built with three different AI agent frameworks. Pick the one that fits your stack:
 
-| | [Pydantic AI](./pydantic-ai/) | [OpenAI Agents SDK](./openai-agents-sdk/) |
-|---|---|---|
-| **Framework** | [pydantic-ai](https://ai.pydantic.dev/) | [openai-agents](https://openai.github.io/openai-agents-python/) |
-| **Get started** | [View README](./pydantic-ai/README.md) | [View README](./openai-agents-sdk/README.md) |
+| | [Pydantic AI](./pydantic-ai/) | [OpenAI Agents SDK](./openai-agents-sdk/) | [Claude Agent SDK](./claude-agent-sdk/) |
+|---|---|---|---|
+| **Framework** | [pydantic-ai](https://ai.pydantic.dev/) | [openai-agents](https://openai.github.io/openai-agents-python/) | [claude-agent-sdk](https://docs.anthropic.com/en/docs/agents/claude-agent-sdk) |
+| **Get started** | [View README](./pydantic-ai/README.md) | [View README](./openai-agents-sdk/README.md) | [View README](./claude-agent-sdk/README.md) |
 
-Both implementations share the same Slack listener layer, the same five simulated IT tools, and the same user experience. The only difference is how the agent is defined and executed under the hood.
+All implementations share the same Slack listener layer, the same five simulated IT tools, and the same user experience. The only difference is how the agent is defined and executed under the hood.
 
 ## What Casey Can Do
 
