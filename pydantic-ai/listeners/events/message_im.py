@@ -37,6 +37,17 @@ def handle_message_im(client: WebClient, event: dict, logger: Logger, say: Say):
         thread_ts = event.get("thread_ts") or event["ts"]
         user_id = event["user"]
 
+        # Get conversation history
+        history = conversation_store.get_history(channel_id, thread_ts)
+
+        # Add eyes reaction only to the first message in a thread
+        if history is None:
+            client.reactions_add(
+                channel=channel_id,
+                timestamp=event["ts"],
+                name="eyes",
+            )
+
         # Set assistant thread status with loading messages
         client.assistant_threads_setStatus(
             channel_id=channel_id,
@@ -50,17 +61,6 @@ def handle_message_im(client: WebClient, event: dict, logger: Logger, say: Say):
                 "Convincing the AI to stop overthinking…",
             ],
         )
-
-        # Get conversation history
-        history = conversation_store.get_history(channel_id, thread_ts)
-
-        # Add eyes reaction only to the first message in a thread
-        if history is None:
-            client.reactions_add(
-                channel=channel_id,
-                timestamp=event["ts"],
-                name="eyes",
-            )
 
         # Run the agent
         deps = CaseyDeps(

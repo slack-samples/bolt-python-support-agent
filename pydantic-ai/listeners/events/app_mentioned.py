@@ -40,6 +40,14 @@ def handle_app_mentioned(client: WebClient, event: dict, logger: Logger, say: Sa
             )
             return
 
+        # Add eyes reaction only to the first message (not threaded replies)
+        if not event.get("thread_ts"):
+            client.reactions_add(
+                channel=channel_id,
+                timestamp=event["ts"],
+                name="eyes",
+            )
+
         # Set assistant thread status with loading messages
         client.assistant_threads_setStatus(
             channel_id=channel_id,
@@ -53,14 +61,6 @@ def handle_app_mentioned(client: WebClient, event: dict, logger: Logger, say: Sa
                 "Convincing the AI to stop overthinking…",
             ],
         )
-
-        # Add eyes reaction only to the first message (not threaded replies)
-        if not event.get("thread_ts"):
-            client.reactions_add(
-                channel=channel_id,
-                timestamp=event["ts"],
-                name="eyes",
-            )
 
         # Get conversation history
         history = conversation_store.get_history(channel_id, thread_ts)

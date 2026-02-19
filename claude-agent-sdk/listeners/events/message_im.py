@@ -39,6 +39,17 @@ async def handle_message_im(
         thread_ts = event.get("thread_ts") or event["ts"]
         user_id = event.get("user")
 
+        # Get session ID for conversation context
+        existing_session_id = session_store.get_session(channel_id, thread_ts)
+
+        # Add eyes reaction only to the first message in a thread
+        if not existing_session_id:
+            await client.reactions_add(
+                channel=channel_id,
+                timestamp=event["ts"],
+                name="eyes",
+            )
+
         # Set assistant thread status with loading messages
         await client.assistant_threads_setStatus(
             channel_id=channel_id,
@@ -52,17 +63,6 @@ async def handle_message_im(
                 "Convincing the AI to stop overthinking…",
             ],
         )
-
-        # Get session ID for conversation context
-        existing_session_id = session_store.get_session(channel_id, thread_ts)
-
-        # Add eyes reaction only to the first message in a thread
-        if not existing_session_id:
-            await client.reactions_add(
-                channel=channel_id,
-                timestamp=event["ts"],
-                name="eyes",
-            )
 
         # Run the agent
         response_text, new_session_id = await run_casey_agent(

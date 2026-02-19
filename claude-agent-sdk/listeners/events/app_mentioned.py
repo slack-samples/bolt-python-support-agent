@@ -42,6 +42,14 @@ async def handle_app_mentioned(
             )
             return
 
+        # Add eyes reaction only to the first message (not threaded replies)
+        if not event.get("thread_ts"):
+            await client.reactions_add(
+                channel=channel_id,
+                timestamp=event["ts"],
+                name="eyes",
+            )
+
         # Set assistant thread status with loading messages
         await client.assistant_threads_setStatus(
             channel_id=channel_id,
@@ -55,14 +63,6 @@ async def handle_app_mentioned(
                 "Convincing the AI to stop overthinking…",
             ],
         )
-
-        # Add eyes reaction only to the first message (not threaded replies)
-        if not event.get("thread_ts"):
-            await client.reactions_add(
-                channel=channel_id,
-                timestamp=event["ts"],
-                name="eyes",
-            )
 
         # Get session ID for conversation context
         existing_session_id = session_store.get_session(channel_id, thread_ts)
