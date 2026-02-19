@@ -52,16 +52,16 @@ def handle_message_im(client: WebClient, event: dict, logger: Logger, say: Say):
             ],
         )
 
-        # Add eyes reaction only to the first message (not threaded replies)
-        if not event.get("thread_ts"):
+        # Get conversation history
+        history = conversation_store.get_history(channel_id, thread_ts)
+
+        # Add eyes reaction only to the first message in a thread
+        if history is None:
             client.reactions_add(
                 channel=channel_id,
                 timestamp=event["ts"],
                 name="eyes",
             )
-
-        # Get conversation history
-        history = conversation_store.get_history(channel_id, thread_ts)
 
         # Build input for the agent
         if history:

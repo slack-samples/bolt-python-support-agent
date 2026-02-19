@@ -53,16 +53,16 @@ async def handle_message_im(
             ],
         )
 
-        # Add eyes reaction only to the first message (not threaded replies)
-        if not event.get("thread_ts"):
+        # Get session ID for conversation context
+        existing_session_id = session_store.get_session(channel_id, thread_ts)
+
+        # Add eyes reaction only to the first message in a thread
+        if not existing_session_id:
             await client.reactions_add(
                 channel=channel_id,
                 timestamp=event["ts"],
                 name="eyes",
             )
-
-        # Get session ID for conversation context
-        existing_session_id = session_store.get_session(channel_id, thread_ts)
 
         # Run the agent
         response_text, new_session_id = await run_casey_agent(
