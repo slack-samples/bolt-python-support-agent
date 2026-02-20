@@ -27,3 +27,21 @@ Casey gives your team instant IT support through three entry points:
 Behind the scenes, Casey has access to five simulated tools: knowledge base search, support ticket creation, password reset, system status checks, and user permissions lookup.
 
 > **Note:** All tools return simulated data for demonstration purposes. In a production app, these would connect to your actual IT systems.
+
+## Local Development
+
+This repo uses a vendored (pre-release) build of `slack-bolt` from the [bolt-python](https://github.com/slackapi/bolt-python) `main` branch. The `.whl` file lives in `vendor/` and is referenced by each app's `requirements.txt`.
+
+Always install dependencies with:
+
+```sh
+pip install -r requirements.txt
+```
+
+Do not use `pip install .` or `pip install -e .` — those read from `pyproject.toml`, which does not reference the vendored wheel.
+
+To update the vendored bolt-python to the latest `main`, run the Claude Code slash command:
+
+```
+/project:update-bolt
+```
