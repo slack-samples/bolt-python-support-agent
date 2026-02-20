@@ -6,7 +6,7 @@ See the root `../.claude/CLAUDE.md` for monorepo-wide architecture, commands, an
 
 ## Pydantic AI Specifics
 
-**Agent (`agent/casey.py`)** is a Pydantic AI `Agent` with `deps_type=CaseyDeps`. The model is **not** set on the agent (to avoid import-time OpenAI client creation); instead `DEFAULT_MODEL` (`openai:gpt-4o-mini`) is passed at each `run_sync()` call site. Tools are passed via the `tools=[]` constructor parameter (not decorators) so each tool lives in its own file under `agent/tools/`.
+**Agent (`agent/casey.py`)** is a Pydantic AI `Agent` with `deps_type=CaseyDeps`. The model is **not** set on the agent (to avoid import-time OpenAI client creation); instead `DEFAULT_MODEL` (`openai:gpt-5-nano`) is passed at each `run_sync()` call site. Tools are passed via the `tools=[]` constructor parameter (not decorators) so each tool lives in its own file under `agent/tools/`.
 
 **Conversation history** stores `list[ModelMessage]` from Pydantic AI and is passed directly as `message_history=` to `run_sync()`.
 

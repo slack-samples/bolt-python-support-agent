@@ -55,5 +55,5 @@ casey_agent = Agent[CaseyDeps](
         check_system_status,
         lookup_user_permissions,
     ],
-    model="gpt-4o-mini",
+    model="gpt-5-nano",
 )

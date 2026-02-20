@@ -65,7 +65,7 @@ Each sub-package has a `register(app)` function called from `listeners/__init__.
 |--------|-----------------|-------------------|-------------|
 | Agent file | `agent/casey.py` | `agent/support_agent.py` | `agent/casey.py` |
 | App type | `AsyncApp` (fully async) | `App` (sync) | `App` (sync) |
-| Agent definition | `ClaudeSDKClient` with `ClaudeAgentOptions` | `Agent[CaseyDeps](model="gpt-4o-mini")` | `Agent(deps_type=CaseyDeps)` |
+| Agent definition | `ClaudeSDKClient` with `ClaudeAgentOptions` | `Agent[CaseyDeps](model="gpt-5-nano")` | `Agent(deps_type=CaseyDeps)` |
 | Model config | Managed by SDK (Claude models) | Set directly on agent constructor | Passed at runtime via `run_sync(model=DEFAULT_MODEL)` |
 | Tool definition | `@tool` decorated functions via MCP server | `@function_tool` decorated functions | Plain async functions |
 | Tool context param | `args` dict (no context param) | `RunContextWrapper[CaseyDeps]` | `RunContext[CaseyDeps]` |

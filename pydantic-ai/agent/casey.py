@@ -45,7 +45,7 @@ technical issues, answer IT questions, and manage support requests through Slack
 - If unsure about a user's issue, ask clarifying questions before taking action
 """
 
-DEFAULT_MODEL = "openai:gpt-4o-mini"
+DEFAULT_MODEL = "openai:gpt-5-nano"
 
 casey_agent = Agent(
     deps_type=CaseyDeps,

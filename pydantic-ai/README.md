@@ -108,7 +108,7 @@ pip install -r requirements.txt
 
 ### OpenAI Setup
 
-This app uses OpenAI's `gpt-4o-mini` model through Pydantic AI.
+This app uses OpenAI's `gpt-5-nano` model through Pydantic AI.
 
 1. Create an API key from your [OpenAI dashboard](https://platform.openai.com/api-keys).
 1. Rename `.env.sample` to `.env`.
