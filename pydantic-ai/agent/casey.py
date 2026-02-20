@@ -62,7 +62,7 @@ BAD: "OMG this is so frustrating!!!" (too emotional)
 - If unsure about a user's issue, ask clarifying questions before taking action
 """
 
-DEFAULT_MODEL = "openai:gpt-5-nano"
+DEFAULT_MODEL = "openai:gpt-4.1-mini"
 
 casey_agent = Agent(
     deps_type=CaseyDeps,
