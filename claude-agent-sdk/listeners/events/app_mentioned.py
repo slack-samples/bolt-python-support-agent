@@ -2,6 +2,7 @@ import random
 import re
 from logging import Logger
 
+from slack_bolt.agent.async_agent import AsyncBoltAgent
 from slack_bolt.context.say.async_say import AsyncSay
 from slack_sdk.web.async_client import AsyncWebClient
 
@@ -22,7 +23,7 @@ CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 
 async def handle_app_mentioned(
-    client: AsyncWebClient, event: dict, logger: Logger, say: AsyncSay
+    client: AsyncWebClient, event: dict, agent: AsyncBoltAgent, logger: Logger, say: AsyncSay
 ):
     """Handle @Casey mentions in channels."""
     try:
@@ -73,9 +74,9 @@ async def handle_app_mentioned(
         )
 
         # Stream response in thread with feedback buttons
-        streamer = await client.chat_stream(
+        streamer = await agent.chat_stream(
             channel=channel_id,
-            recipient_team_id=team_id,
+            recipient_team_id=team_id, # chat_stream helper cannot infer event["team"] from client
             recipient_user_id=user_id,
             thread_ts=thread_ts,
         )

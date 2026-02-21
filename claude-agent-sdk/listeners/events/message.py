@@ -1,6 +1,7 @@
 import random
 from logging import Logger
 
+from slack_bolt.agent.async_agent import AsyncBoltAgent
 from slack_bolt.context.say.async_say import AsyncSay
 from slack_sdk.web.async_client import AsyncWebClient
 
@@ -21,7 +22,7 @@ CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 
 async def handle_message(
-    client: AsyncWebClient, event: dict, logger: Logger, say: AsyncSay
+    client: AsyncWebClient, event: dict, agent: AsyncBoltAgent, logger: Logger, say: AsyncSay
 ):
     """Handle direct messages sent to Casey."""
     # Skip bot messages and message subtypes (edits, deletes, etc.)
@@ -34,7 +35,6 @@ async def handle_message(
 
     try:
         channel_id = event["channel"]
-        team_id = event.get("team")
         text = event.get("text", "")
         thread_ts = event.get("thread_ts") or event["ts"]
         user_id = event.get("user")
@@ -70,12 +70,7 @@ async def handle_message(
         )
 
         # Stream response in thread with feedback buttons
-        streamer = await client.chat_stream(
-            channel=channel_id,
-            recipient_team_id=team_id,
-            recipient_user_id=user_id,
-            thread_ts=thread_ts,
-        )
+        streamer = await agent.chat_stream()
         await streamer.append(markdown_text=response_text)
         feedback_blocks = create_feedback_block()
         await streamer.stop(blocks=feedback_blocks)

@@ -1,7 +1,7 @@
 import random
 from logging import Logger
 
-from slack_bolt import Say
+from slack_bolt import BoltAgent, Say
 from slack_sdk import WebClient
 
 from agent import DEFAULT_MODEL, CaseyDeps, casey_agent
@@ -20,7 +20,7 @@ RESOLUTION_PHRASES = [
 CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 
-def handle_message(client: WebClient, event: dict, logger: Logger, say: Say):
+def handle_message(client: WebClient, event: dict, agent: BoltAgent, logger: Logger, say: Say):
     """Handle direct messages sent to Casey."""
     # Skip bot messages and message subtypes (edits, deletes, etc.)
     if event.get("bot_id") or event.get("subtype"):
@@ -32,7 +32,6 @@ def handle_message(client: WebClient, event: dict, logger: Logger, say: Say):
 
     try:
         channel_id = event["channel"]
-        team_id = event.get("team")
         text = event.get("text", "")
         thread_ts = event.get("thread_ts") or event["ts"]
         user_id = event["user"]
@@ -77,12 +76,7 @@ def handle_message(client: WebClient, event: dict, logger: Logger, say: Say):
         )
 
         # Stream response in thread with feedback buttons
-        streamer = client.chat_stream(
-            channel=channel_id,
-            recipient_team_id=team_id,
-            recipient_user_id=user_id,
-            thread_ts=thread_ts,
-        )
+        streamer = agent.chat_stream()
         streamer.append(markdown_text=result.output)
         feedback_blocks = create_feedback_block()
         streamer.stop(blocks=feedback_blocks)
