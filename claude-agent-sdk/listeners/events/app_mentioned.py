@@ -23,7 +23,11 @@ CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 
 async def handle_app_mentioned(
-    client: AsyncWebClient, event: dict, agent: AsyncBoltAgent, logger: Logger, say: AsyncSay
+    client: AsyncWebClient,
+    event: dict,
+    agent: AsyncBoltAgent,
+    logger: Logger,
+    say: AsyncSay,
 ):
     """Handle @Casey mentions in channels."""
     try:
@@ -76,7 +80,7 @@ async def handle_app_mentioned(
         # Stream response in thread with feedback buttons
         streamer = await agent.chat_stream(
             channel=channel_id,
-            recipient_team_id=team_id, # chat_stream helper cannot infer event["team"] from client
+            recipient_team_id=team_id,  # chat_stream helper cannot infer event["team"] from client
             recipient_user_id=user_id,
             thread_ts=thread_ts,
         )

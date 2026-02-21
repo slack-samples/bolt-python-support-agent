@@ -22,7 +22,11 @@ CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 
 async def handle_message(
-    client: AsyncWebClient, event: dict, agent: AsyncBoltAgent, logger: Logger, say: AsyncSay
+    client: AsyncWebClient,
+    event: dict,
+    agent: AsyncBoltAgent,
+    logger: Logger,
+    say: AsyncSay,
 ):
     """Handle direct messages sent to Casey."""
     # Skip bot messages and message subtypes (edits, deletes, etc.)
@@ -37,7 +41,6 @@ async def handle_message(
         channel_id = event["channel"]
         text = event.get("text", "")
         thread_ts = event.get("thread_ts") or event["ts"]
-        user_id = event.get("user")
 
         # Get session ID for conversation context
         existing_session_id = session_store.get_session(channel_id, thread_ts)

@@ -21,7 +21,9 @@ RESOLUTION_PHRASES = [
 CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 
-def handle_app_mentioned(client: WebClient, event: dict, agent: BoltAgent, logger: Logger, say: Say):
+def handle_app_mentioned(
+    client: WebClient, event: dict, agent: BoltAgent, logger: Logger, say: Say
+):
     """Handle @Casey mentions in channels."""
     try:
         channel_id = event["channel"]
@@ -82,7 +84,7 @@ def handle_app_mentioned(client: WebClient, event: dict, agent: BoltAgent, logge
         # Stream response in thread with feedback buttons
         streamer = agent.chat_stream(
             channel=channel_id,
-            recipient_team_id=team_id, # chat_stream helper cannot infer event["team"] from client
+            recipient_team_id=team_id,  # chat_stream helper cannot infer event["team"] from client
             recipient_user_id=user_id,
             thread_ts=thread_ts,
         )

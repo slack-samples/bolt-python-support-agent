@@ -8,7 +8,9 @@ from conversation import conversation_store
 from listeners.views.feedback_block import create_feedback_block
 
 
-def handle_issue_submission(ack: Ack, body: dict, client: WebClient, agent: BoltAgent, logger: Logger):
+def handle_issue_submission(
+    ack: Ack, body: dict, client: WebClient, agent: BoltAgent, logger: Logger
+):
     """Handle modal submission: open DM, post issue, and run Casey agent."""
     ack()
 
