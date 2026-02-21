@@ -180,7 +180,7 @@ Every incoming request is routed to a "listener". This directory groups each lis
 
 - `app_home_opened.py` — Publishes the App Home view with category buttons.
 - `app_mentioned.py` — Responds to `@Casey` mentions in channels.
-- `message_im.py` — Responds to direct messages from users.
+- `message.py` — Responds to direct messages from users.
 
 **`/listeners/actions`** — Handles interactive components:
 

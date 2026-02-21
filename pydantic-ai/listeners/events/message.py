@@ -20,7 +20,7 @@ RESOLUTION_PHRASES = [
 CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 
-def handle_message_im(client: WebClient, event: dict, logger: Logger, say: Say):
+def handle_message(client: WebClient, event: dict, logger: Logger, say: Say):
     """Handle direct messages sent to Casey."""
     # Skip bot messages and message subtypes (edits, deletes, etc.)
     if event.get("bot_id") or event.get("subtype"):

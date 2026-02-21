@@ -12,4 +12,4 @@ See the root `../.claude/CLAUDE.md` for monorepo-wide architecture, commands, an
 
 **Feedback blocks** use the native `FeedbackButtonsElement` from `slack_sdk.models.blocks`. A single `feedback` action ID is registered.
 
-The `message_im` handler only adds the `:eyes:` reaction on the first message in a thread (`if not event.get("thread_ts")`).
+The `message` handler only adds the `:eyes:` reaction on the first message in a thread (`if not event.get("thread_ts")`).

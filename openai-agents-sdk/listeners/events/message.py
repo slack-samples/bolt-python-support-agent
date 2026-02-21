@@ -1,11 +1,12 @@
 import random
 from logging import Logger
 
-from slack_bolt.context.say.async_say import AsyncSay
-from slack_sdk.web.async_client import AsyncWebClient
+from agents import Runner
+from slack_bolt import Say
+from slack_sdk import WebClient
 
-from agent import run_casey_agent
-from conversation import session_store
+from agent import CaseyDeps, casey_agent
+from conversation import conversation_store
 from listeners.views.feedback_block import create_feedback_block
 
 RESOLUTION_PHRASES = [
@@ -20,9 +21,7 @@ RESOLUTION_PHRASES = [
 CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 
-async def handle_message_im(
-    client: AsyncWebClient, event: dict, logger: Logger, say: AsyncSay
-):
+def handle_message(client: WebClient, event: dict, logger: Logger, say: Say):
     """Handle direct messages sent to Casey."""
     # Skip bot messages and message subtypes (edits, deletes, etc.)
     if event.get("bot_id") or event.get("subtype"):
@@ -37,21 +36,21 @@ async def handle_message_im(
         team_id = event.get("team")
         text = event.get("text", "")
         thread_ts = event.get("thread_ts") or event["ts"]
-        user_id = event.get("user")
+        user_id = event["user"]
 
-        # Get session ID for conversation context
-        existing_session_id = session_store.get_session(channel_id, thread_ts)
+        # Get conversation history
+        history = conversation_store.get_history(channel_id, thread_ts)
 
         # Add eyes reaction only to the first message in a thread
-        if not existing_session_id:
-            await client.reactions_add(
+        if history is None:
+            client.reactions_add(
                 channel=channel_id,
                 timestamp=event["ts"],
                 name="eyes",
             )
 
         # Set assistant thread status with loading messages
-        await client.assistant_threads_setStatus(
+        client.assistant_threads_setStatus(
             channel_id=channel_id,
             thread_ts=thread_ts,
             status="Thinking...",
@@ -64,39 +63,48 @@ async def handle_message_im(
             ],
         )
 
+        # Build input for the agent
+        if history:
+            input_items = history + [{"role": "user", "content": text}]
+        else:
+            input_items = text
+
         # Run the agent
-        response_text, new_session_id = await run_casey_agent(
-            text, session_id=existing_session_id
+        deps = CaseyDeps(
+            client=client,
+            user_id=user_id,
+            channel_id=channel_id,
+            thread_ts=thread_ts,
         )
+        result = Runner.run_sync(casey_agent, input=input_items, context=deps)
 
         # Stream response in thread with feedback buttons
-        streamer = await client.chat_stream(
+        streamer = client.chat_stream(
             channel=channel_id,
             recipient_team_id=team_id,
             recipient_user_id=user_id,
             thread_ts=thread_ts,
         )
-        await streamer.append(markdown_text=response_text)
+        streamer.append(markdown_text=result.final_output)
         feedback_blocks = create_feedback_block()
-        await streamer.stop(blocks=feedback_blocks)
+        streamer.stop(blocks=feedback_blocks)
 
-        # Store session ID for future context
-        if new_session_id:
-            session_store.set_session(channel_id, thread_ts, new_session_id)
+        # Store conversation history
+        conversation_store.set_history(channel_id, thread_ts, result.to_input_list())
 
         # ~30% chance contextual emoji
         if random.random() < 0.3:
             emoji = random.choice(CONTEXTUAL_EMOJIS)
-            await client.reactions_add(
+            client.reactions_add(
                 channel=channel_id,
                 timestamp=event["ts"],
                 name=emoji,
             )
 
         # Check for resolution phrases
-        output_lower = response_text.lower()
+        output_lower = result.final_output.lower()
         if any(phrase in output_lower for phrase in RESOLUTION_PHRASES):
-            await client.reactions_add(
+            client.reactions_add(
                 channel=channel_id,
                 timestamp=event["ts"],
                 name="white_check_mark",
@@ -104,7 +112,7 @@ async def handle_message_im(
 
     except Exception as e:
         logger.exception(f"Failed to handle DM: {e}")
-        await say(
+        say(
             text=f":warning: Something went wrong! ({e})",
             thread_ts=event.get("thread_ts") or event.get("ts"),
         )

@@ -47,7 +47,7 @@ Three-layer design: **app.py** → **listeners/** → **agent/**
 **Entry point (`app.py`)** initializes Bolt with Socket Mode and calls `register_listeners(app)`.
 
 **Listeners** are organized by Slack platform feature:
-- `listeners/events/` — `app_home_opened`, `app_mentioned`, `message_im`
+- `listeners/events/` — `app_home_opened`, `app_mentioned`, `message`
 - `listeners/actions/` — `category_buttons` (regex `^category_`), feedback handlers
 - `listeners/views/` — `issue_submission` modal handler
 
