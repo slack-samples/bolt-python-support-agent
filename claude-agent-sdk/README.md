@@ -101,7 +101,6 @@ source .venv/bin/activate  # for Windows OS, .\.venv\Scripts\Activate instead sh
 
 ```sh
 pip install -r requirements.txt
-# or pip install -e .
 ```
 
 ## Providers
