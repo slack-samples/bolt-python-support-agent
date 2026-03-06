@@ -7,7 +7,7 @@ dependencies = [
     # slack-bolt is installed from a vendored whl — see ../vendor/
     "slack-cli-hooks<1.0.0",
     "pydantic-ai[openai]",
-    "python-dotenv==1.2.1",
+    "python-dotenv==1.2.2",
 ]
 
 [project.optional-dependencies]
