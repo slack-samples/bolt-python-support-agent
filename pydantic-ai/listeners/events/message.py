@@ -4,9 +4,10 @@ from logging import Logger
 from slack_bolt import Say
 from slack_sdk import WebClient
 
-from agent import DEFAULT_MODEL, CaseyDeps, casey_agent
+from agent import CaseyDeps, run_casey
 from conversation import conversation_store
 from listeners.views.feedback_block import create_feedback_block
+from oauth import installation_store
 
 RESOLUTION_PHRASES = [
     "resolved",
@@ -62,19 +63,21 @@ def handle_message(client: WebClient, event: dict, logger: Logger, say: Say):
             ],
         )
 
+        # Look up user token from the installation store
+        installation = installation_store.find_installation(
+            enterprise_id=None, team_id=event.get("team", ""), user_id=user_id
+        )
+        user_token = installation.user_token if installation else None
+
         # Run the agent
         deps = CaseyDeps(
             client=client,
             user_id=user_id,
             channel_id=channel_id,
             thread_ts=thread_ts,
+            user_token=user_token,
         )
-        result = casey_agent.run_sync(
-            text,
-            model=DEFAULT_MODEL,
-            deps=deps,
-            message_history=history,
-        )
+        result = run_casey(text, deps, message_history=history)
 
         # Stream response in thread with feedback buttons
         streamer = client.chat_stream(

@@ -1,4 +1,5 @@
 from pydantic_ai import Agent
+from pydantic_ai.mcp import MCPServerStreamableHTTP
 
 from agent.deps import CaseyDeps
 from agent.tools import (
@@ -54,6 +55,13 @@ BAD: "OMG this is so frustrating!!!" (too emotional)
 - Create a ticket when the user has already tried the KB steps and they didn't work
 - For access requests, verify the system name and create a ticket with the details
 
+## SLACK CAPABILITIES
+- You have access to the user's Slack workspace through the Slack MCP server
+- You can search messages, files, users, and channels
+- You can read channel history, threads, canvases, and user profiles
+- Use these capabilities when relevant to help troubleshoot issues or find information
+- Always respect user privacy — only access information relevant to the support request
+
 ## BOUNDARIES
 - You are an IT helpdesk agent only — politely redirect non-IT questions
 - Do not make up system statuses or ticket numbers — always use the provided tools
@@ -62,6 +70,8 @@ BAD: "OMG this is so frustrating!!!" (too emotional)
 """
 
 DEFAULT_MODEL = "openai:gpt-4.1-mini"
+
+SLACK_MCP_URL = "https://mcp.slack.com/mcp"
 
 casey_agent = Agent(
     deps_type=CaseyDeps,
@@ -74,3 +84,30 @@ casey_agent = Agent(
         lookup_user_permissions,
     ],
 )
+
+
+def run_casey(
+    text: str,
+    deps: CaseyDeps,
+    message_history=None,
+):
+    """Run the Casey agent, optionally connecting to the Slack MCP server."""
+    if deps.user_token:
+        slack_mcp = MCPServerStreamableHTTP(
+            SLACK_MCP_URL,
+            headers={"Authorization": f"Bearer {deps.user_token}"},
+        )
+        with casey_agent.override(mcp_servers=[slack_mcp]):
+            return casey_agent.run_sync(
+                text,
+                model=DEFAULT_MODEL,
+                deps=deps,
+                message_history=message_history,
+            )
+
+    return casey_agent.run_sync(
+        text,
+        model=DEFAULT_MODEL,
+        deps=deps,
+        message_history=message_history,
+    )

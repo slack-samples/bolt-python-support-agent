@@ -9,3 +9,4 @@ class CaseyDeps:
     user_id: str
     channel_id: str
     thread_ts: str
+    user_token: str | None = None

@@ -3,9 +3,10 @@ from logging import Logger
 from slack_bolt import Ack
 from slack_sdk import WebClient
 
-from agent import DEFAULT_MODEL, CaseyDeps, casey_agent
+from agent import CaseyDeps, run_casey
 from conversation import conversation_store
 from listeners.views.feedback_block import create_feedback_block
+from oauth import installation_store
 
 
 def handle_issue_submission(ack: Ack, body: dict, client: WebClient, logger: Logger):
@@ -54,14 +55,21 @@ def handle_issue_submission(ack: Ack, body: dict, client: WebClient, logger: Log
             name="eyes",
         )
 
+        # Look up user token from the installation store
+        installation = installation_store.find_installation(
+            enterprise_id=None, team_id=team_id, user_id=user_id
+        )
+        user_token = installation.user_token if installation else None
+
         # Run the agent
         deps = CaseyDeps(
             client=client,
             user_id=user_id,
             channel_id=channel_id,
             thread_ts=thread_ts,
+            user_token=user_token,
         )
-        result = casey_agent.run_sync(user_message, model=DEFAULT_MODEL, deps=deps)
+        result = run_casey(user_message, deps)
 
         # Stream the response in thread with feedback buttons
         streamer = client.chat_stream(

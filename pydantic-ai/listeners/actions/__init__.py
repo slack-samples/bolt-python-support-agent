@@ -9,3 +9,6 @@ from .feedback import handle_feedback
 def register(app: App):
     app.action(re.compile(r"^category_"))(handle_category_button)
     app.action("feedback")(handle_feedback)
+    @app.action("authorize_casey")
+    def authorize_casey(ack):
+        ack()
