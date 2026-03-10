@@ -9,7 +9,7 @@ from oauth.state import generate_state
 
 
 def handle_disconnect(
-    ack, body: dict, client: WebClient, context: BoltContext, logger: Logger
+    ack, client: WebClient, context: BoltContext, logger: Logger
 ):
     ack()
     try:
