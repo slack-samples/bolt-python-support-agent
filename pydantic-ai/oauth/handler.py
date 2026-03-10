@@ -13,13 +13,6 @@ from oauth.state import consume_state
 
 logger = logging.getLogger(__name__)
 
-SUCCESS_HTML = (
-    "<html><body>"
-    "<h1>Authorization successful!</h1>"
-    "<p>You can close this window and return to Slack.</p>"
-    "</body></html>"
-)
-
 FAILURE_HTML = (
     "<html><body>"
     "<h1>Authorization failed</h1>"
@@ -87,11 +80,18 @@ class OAuthCallbackHandler(BaseHTTPRequestHandler):
             )
             logger.info(f"Stored user token for team={team_id} user={user_id}")
 
-            self._respond(200, SUCCESS_HTML, content_type="text/html")
+            app_id = oauth_response.get("app_id")
+            redirect_team = team_id or enterprise_id
+            self._redirect(f"slack://app?team={redirect_team}&id={app_id}&tab=home")
 
         except Exception:
             logger.exception("OAuth token exchange failed")
             self._respond(500, FAILURE_HTML, content_type="text/html")
+
+    def _redirect(self, url: str):
+        self.send_response(302)
+        self.send_header("Location", url)
+        self.end_headers()
 
     def _respond(self, status: int, body: str, content_type: str = "text/plain"):
         self.send_response(status)

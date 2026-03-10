@@ -26,8 +26,10 @@ CATEGORIES = [
     },
 ]
 
-
-def build_app_home_view(authorize_url: str | None = None) -> dict:
+# TODO: improve the behavior around this if possible maybe we can use a builder pattern
+def build_app_home_view(
+    authorize_url: str | None = None, has_installation: bool = False
+) -> dict:
     """Build the App Home Block Kit view with category buttons."""
     blocks = []
 
@@ -107,6 +109,28 @@ def build_app_home_view(authorize_url: str | None = None) -> dict:
             },
         ]
     )
+
+    if has_installation:
+        blocks.append({"type": "divider"})
+        blocks.append(
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "This will revoke Casey's access to your Slack account.",
+                },
+                "accessory": {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Disconnect",
+                        "emoji": True,
+                    },
+                    "action_id": "disconnect_casey",
+                    "style": "danger",
+                },
+            }
+        )
 
     return {
         "type": "home",
