@@ -1,6 +1,7 @@
 import random
 from logging import Logger
 
+from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.context.say.async_say import AsyncSay
 from slack_sdk.web.async_client import AsyncWebClient
 
@@ -21,7 +22,11 @@ CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 
 async def handle_message(
-    client: AsyncWebClient, event: dict, logger: Logger, say: AsyncSay
+    client: AsyncWebClient,
+    context: AsyncBoltContext,
+    event: dict,
+    logger: Logger,
+    say: AsyncSay,
 ):
     """Handle direct messages sent to Casey."""
     # Skip bot messages and message subtypes (edits, deletes, etc.)
@@ -33,11 +38,11 @@ async def handle_message(
         return
 
     try:
-        channel_id = event["channel"]
-        team_id = event.get("team")
+        channel_id = context.channel_id
+        team_id = context.team_id
         text = event.get("text", "")
         thread_ts = event.get("thread_ts") or event["ts"]
-        user_id = event.get("user")
+        user_id = context.user_id
 
         # Get session ID for conversation context
         existing_session_id = session_store.get_session(channel_id, thread_ts)

@@ -1,16 +1,23 @@
 from logging import Logger
 
 from slack_bolt import Ack
+from slack_bolt.context.async_context import AsyncBoltContext
 from slack_sdk.web.async_client import AsyncWebClient
 
 
-async def handle_feedback(ack: Ack, body: dict, client: AsyncWebClient, logger: Logger):
+async def handle_feedback(
+    ack: Ack,
+    body: dict,
+    client: AsyncWebClient,
+    context: AsyncBoltContext,
+    logger: Logger,
+):
     """Handle thumbs up/down feedback on Casey's responses."""
     await ack()
 
     try:
-        channel_id = body["channel"]["id"]
-        user_id = body["user"]["id"]
+        channel_id = context.channel_id
+        user_id = context.user_id
         message_ts = body["message"]["ts"]
         feedback_value = body["actions"][0]["value"]
 
