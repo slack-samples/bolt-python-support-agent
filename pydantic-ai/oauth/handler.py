@@ -1,5 +1,6 @@
 """Custom OAuth callback handler for user-scoped tokens."""
 
+import html
 import logging
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import parse_qs, urlparse
@@ -82,16 +83,33 @@ class OAuthCallbackHandler(BaseHTTPRequestHandler):
 
             app_id = oauth_response.get("app_id")
             redirect_team = team_id or enterprise_id
-            self._redirect(f"slack://app?team={redirect_team}&id={app_id}&tab=home")
+            success_html = self._build_success_html(redirect_team, app_id, team_id)
+            self._respond(200, success_html, content_type="text/html")
 
         except Exception:
             logger.exception("OAuth token exchange failed")
             self._respond(500, FAILURE_HTML, content_type="text/html")
 
-    def _redirect(self, url: str):
-        self.send_response(302)
-        self.send_header("Location", url)
-        self.end_headers()
+    def _build_success_html(self, redirect_team: str, app_id: str, team_id: str) -> str:
+        url = html.escape(f"slack://app?team={redirect_team}&id={app_id}")
+        browser_url = html.escape(f"https://app.slack.com/client/{team_id}")
+        return (
+            "<html>"
+            "<head>"
+            f'<meta http-equiv="refresh" content="0; URL={url}">'
+            "<style>"
+            "body { padding: 10px 15px; font-family: verdana; text-align: center; }"
+            "</style>"
+            "</head>"
+            "<body>"
+            "<h2>Thank you!</h2>"
+            "<p>Redirecting to the Slack App... click "
+            f'<a href="{url}">here</a>. '
+            "If you use the browser version of Slack, click "
+            f'<a href="{browser_url}" target="_blank">this link</a> instead.</p>'
+            "</body>"
+            "</html>"
+        )
 
     def _respond(self, status: int, body: str, content_type: str = "text/plain"):
         self.send_response(status)
