@@ -1,7 +1,7 @@
 import random
 from logging import Logger
 
-from slack_bolt import Say
+from slack_bolt import BoltContext, Say
 from slack_sdk import WebClient
 
 from agent import CaseyDeps, run_casey
@@ -21,7 +21,9 @@ RESOLUTION_PHRASES = [
 CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 
-def handle_message(client: WebClient, event: dict, logger: Logger, say: Say):
+def handle_message(
+    client: WebClient, event: dict, logger: Logger, say: Say, context: BoltContext
+):
     """Handle direct messages sent to Casey."""
     # Skip bot messages and message subtypes (edits, deletes, etc.)
     if event.get("bot_id") or event.get("subtype"):
@@ -32,11 +34,11 @@ def handle_message(client: WebClient, event: dict, logger: Logger, say: Say):
         return
 
     try:
-        channel_id = event["channel"]
-        team_id = event.get("team")
+        channel_id = context.channel_id
+        team_id = context.team_id
         text = event.get("text", "")
-        thread_ts = event.get("thread_ts") or event["ts"]
-        user_id = event["user"]
+        thread_ts = context.thread_ts or event["ts"]
+        user_id = context.user_id
 
         # Get conversation history
         history = conversation_store.get_history(channel_id, thread_ts)
@@ -65,7 +67,9 @@ def handle_message(client: WebClient, event: dict, logger: Logger, say: Say):
 
         # Look up user token from the installation store
         installation = installation_store.find_installation(
-            enterprise_id=None, team_id=event.get("team", ""), user_id=user_id
+            enterprise_id=context.enterprise_id,
+            team_id=context.team_id,
+            user_id=user_id,
         )
         user_token = installation.user_token if installation else None
 

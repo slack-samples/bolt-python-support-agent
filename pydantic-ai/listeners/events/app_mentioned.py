@@ -2,7 +2,7 @@ import random
 import re
 from logging import Logger
 
-from slack_bolt import Say
+from slack_bolt import BoltContext, Say
 from slack_sdk import WebClient
 
 from agent import CaseyDeps, run_casey
@@ -22,14 +22,16 @@ RESOLUTION_PHRASES = [
 CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 
-def handle_app_mentioned(client: WebClient, event: dict, logger: Logger, say: Say):
+def handle_app_mentioned(
+    client: WebClient, event: dict, logger: Logger, say: Say, context: BoltContext
+):
     """Handle @Casey mentions in channels."""
     try:
-        channel_id = event["channel"]
-        team_id = event.get("team")
+        channel_id = context.channel_id
+        team_id = context.team_id
         text = event.get("text", "")
-        thread_ts = event.get("thread_ts") or event["ts"]
-        user_id = event["user"]
+        thread_ts = context.thread_ts or event["ts"]
+        user_id = context.user_id
 
         # Strip the bot mention from the text
         cleaned_text = re.sub(r"<@[A-Z0-9]+>", "", text).strip()
@@ -68,7 +70,9 @@ def handle_app_mentioned(client: WebClient, event: dict, logger: Logger, say: Sa
 
         # Look up user token from the installation store
         installation = installation_store.find_installation(
-            enterprise_id=None, team_id=event.get("team", ""), user_id=user_id
+            enterprise_id=context.enterprise_id,
+            team_id=context.team_id,
+            user_id=user_id,
         )
         user_token = installation.user_token if installation else None
 

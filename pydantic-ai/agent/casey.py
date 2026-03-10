@@ -92,22 +92,19 @@ def run_casey(
     message_history=None,
 ):
     """Run the Casey agent, optionally connecting to the Slack MCP server."""
+    toolsets = []
     if deps.user_token:
-        slack_mcp = MCPServerStreamableHTTP(
-            SLACK_MCP_URL,
-            headers={"Authorization": f"Bearer {deps.user_token}"},
-        )
-        with casey_agent.override(mcp_servers=[slack_mcp]):
-            return casey_agent.run_sync(
-                text,
-                model=DEFAULT_MODEL,
-                deps=deps,
-                message_history=message_history,
+        toolsets.append(
+            MCPServerStreamableHTTP(
+                SLACK_MCP_URL,
+                headers={"Authorization": f"Bearer {deps.user_token}"},
             )
+        )
 
     return casey_agent.run_sync(
         text,
         model=DEFAULT_MODEL,
         deps=deps,
         message_history=message_history,
+        toolsets=toolsets,
     )

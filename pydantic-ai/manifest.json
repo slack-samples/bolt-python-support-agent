@@ -31,7 +31,13 @@
         "groups:read",
         "canvases:read",
         "users:read",
-        "users:read.email"
+        "users:read.email",
+        "search:read.public",
+        "search:read.private",
+        "search:read.mpim",
+        "search:read.im",
+        "search:read.files",
+        "search:read.users"
       ],
       "bot": [
         "app_mentions:read",

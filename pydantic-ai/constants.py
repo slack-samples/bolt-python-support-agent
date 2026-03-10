@@ -22,11 +22,21 @@ USER_SCOPES = [
     "canvases:read",
     "users:read",
     "users:read.email",
+    "search:read.public",
+    "search:read.private",
+    "search:read.mpim",
+    "search:read.im",
+    "search:read.files",
+    "search:read.users",
 ]
 BOT_SCOPES = [
     "app_mentions:read",
+    "chat:write",
     "im:history",
     "im:read",
+    "im:write",
+    "reactions:write",
     "reactions:read",
     "users:read",
+    "assistant:write",
 ]

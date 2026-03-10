@@ -26,13 +26,58 @@ CATEGORIES = [
     },
 ]
 
-# TODO: improve the behavior around this if possible maybe we can use a builder pattern
-def build_app_home_view(
-    authorize_url: str | None = None, has_installation: bool = False
-) -> dict:
-    """Build the App Home Block Kit view with category buttons."""
-    blocks = []
 
+def build_app_home_view(authorize_url: str | None = None) -> dict:
+    """Build the App Home Block Kit view with category buttons."""
+    blocks = [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": "Hey there :wave: I'm Casey, your IT helpdesk agent.",
+            },
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": (
+                    "I can help you troubleshoot technical issues, reset passwords, "
+                    "check system status, and create support tickets.\n\n"
+                    "*Choose a category below to get started*, or send me a direct message anytime."
+                ),
+            },
+        },
+        {"type": "divider"},
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": cat["text"],
+                        "emoji": True,
+                    },
+                    "action_id": cat["action_id"],
+                    "value": cat["value"],
+                }
+                for cat in CATEGORIES
+            ],
+        },
+        {"type": "divider"},
+        {
+            "type": "context",
+            "elements": [
+                {
+                    "type": "mrkdwn",
+                    "text": "You can also mention me in any channel with `@Casey` or send me a DM.",
+                }
+            ],
+        },
+    ]
+
+    blocks.append({"type": "divider"})
     if authorize_url:
         blocks.append(
             {
@@ -40,16 +85,15 @@ def build_app_home_view(
                 "text": {
                     "type": "mrkdwn",
                     "text": (
-                        ":warning: *Authorization required* — To unlock full functionality "
-                        "(searching messages, reading channels, etc.), please authorize Casey "
-                        "with your Slack account."
+                        "Connect your Slack account to unlock full functionality "
+                        "(searching messages, reading channels, etc.)."
                     ),
                 },
                 "accessory": {
                     "type": "button",
                     "text": {
                         "type": "plain_text",
-                        "text": "Authorize",
+                        "text": "Connect",
                         "emoji": True,
                     },
                     "url": authorize_url,
@@ -58,60 +102,7 @@ def build_app_home_view(
                 },
             }
         )
-        blocks.append({"type": "divider"})
-
-    blocks.extend(
-        [
-            {
-                "type": "header",
-                "text": {
-                    "type": "plain_text",
-                    "text": "Hey there :wave: I'm Casey, your IT helpdesk agent.",
-                },
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": (
-                        "I can help you troubleshoot technical issues, reset passwords, "
-                        "check system status, and create support tickets.\n\n"
-                        "*Choose a category below to get started*, or send me a direct message anytime."
-                    ),
-                },
-            },
-            {"type": "divider"},
-            {
-                "type": "actions",
-                "elements": [
-                    {
-                        "type": "button",
-                        "text": {
-                            "type": "plain_text",
-                            "text": cat["text"],
-                            "emoji": True,
-                        },
-                        "action_id": cat["action_id"],
-                        "value": cat["value"],
-                    }
-                    for cat in CATEGORIES
-                ],
-            },
-            {"type": "divider"},
-            {
-                "type": "context",
-                "elements": [
-                    {
-                        "type": "mrkdwn",
-                        "text": "You can also mention me in any channel with `@Casey` or send me a DM.",
-                    }
-                ],
-            },
-        ]
-    )
-
-    if has_installation:
-        blocks.append({"type": "divider"})
+    else:
         blocks.append(
             {
                 "type": "section",

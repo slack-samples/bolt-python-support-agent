@@ -13,7 +13,7 @@ def handle_disconnect(
 ):
     ack()
     try:
-        user_id = body["user"]["id"]
+        user_id = context.user_id
         enterprise_id = context.enterprise_id
         team_id = context.team_id
 
