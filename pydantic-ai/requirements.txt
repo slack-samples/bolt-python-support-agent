@@ -5,4 +5,4 @@ pydantic-ai[openai]
 python-dotenv==1.2.2
 
 pytest
-ruff==0.15.7
+ruff==0.15.8
