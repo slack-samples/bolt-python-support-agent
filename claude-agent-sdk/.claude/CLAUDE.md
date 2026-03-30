@@ -12,7 +12,7 @@ See the root `../.claude/CLAUDE.md` for monorepo-wide architecture, commands, an
 
 **Tools (`agent/tools/`)** are defined with the `@tool` decorator from `claude_agent_sdk`. Each tool returns `{"content": [{"type": "text", "text": ...}]}`. Tools are registered into a single MCP server via `create_sdk_mcp_server()`.
 
-**Conversation history** is managed server-side by the Claude Agent SDK via sessions. The local `SessionStore` (`conversation/store.py`) only maps `(channel_id, thread_ts)` to session IDs. Sessions are resumed via `ClaudeAgentOptions(resume=session_id)`.
+**Conversation history** is managed server-side by the Claude Agent SDK via sessions. The local `SessionStore` (`thread_context/store.py`) only maps `(channel_id, thread_ts)` to session IDs. Sessions are resumed via `ClaudeAgentOptions(resume=session_id)`.
 
 **Feedback blocks** use the native `FeedbackButtonsElement` from `slack_sdk.models.blocks`. A single `feedback` action ID is registered.
 

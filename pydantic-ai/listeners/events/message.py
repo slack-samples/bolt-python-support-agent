@@ -5,7 +5,7 @@ from slack_bolt import BoltContext, Say, SayStream, SetStatus
 from slack_sdk import WebClient
 
 from agent import DEFAULT_MODEL, CaseyDeps, casey_agent
-from conversation import conversation_store
+from thread_context import conversation_store
 from listeners.views.feedback_block import create_feedback_block
 
 RESOLUTION_PHRASES = [

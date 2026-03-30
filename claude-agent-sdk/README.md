@@ -202,6 +202,6 @@ The `deps.py` file defines the `CaseyDeps` dataclass passed to the agent at runt
 
 The `tools` directory contains five IT helpdesk tools defined using the `@tool` decorator from the Claude Agent SDK.
 
-### `/conversation`
+### `/thread_context`
 
 The `store.py` file implements a thread-safe in-memory session ID store, keyed by channel and thread. The Claude Agent SDK manages conversation history server-side via sessions, so only session IDs need to be tracked locally for resuming conversations.

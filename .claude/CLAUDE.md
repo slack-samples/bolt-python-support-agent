@@ -55,7 +55,7 @@ Each sub-package has a `register(app)` function called from `listeners/__init__.
 
 **CaseyDeps** (`agent/deps.py`) is a dataclass carrying `client`, `user_id`, `channel_id`, `thread_ts`. Constructed in each listener handler and passed to the agent at runtime.
 
-**Conversation history** (`conversation/store.py`) is a thread-safe in-memory dict keyed by `(channel_id, thread_ts)` with TTL-based cleanup. This enables multi-turn context.
+**Conversation history** (`thread_context/store.py`) is a thread-safe in-memory dict keyed by `(channel_id, thread_ts)` with TTL-based cleanup. This enables multi-turn context.
 
 **Handler flow** (DM, mention, modal submit): add `:eyes:` reaction → get history from store → run agent → post response in thread with feedback blocks → store updated messages.
 

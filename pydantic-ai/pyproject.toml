@@ -17,7 +17,7 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["agent*", "listeners*", "conversation*"]
+include = ["agent*", "listeners*", "thread_context*"]
 
 [tool.ruff]
 [tool.ruff.lint]

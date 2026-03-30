@@ -5,7 +5,7 @@ from slack_bolt.context.async_context import AsyncBoltContext
 from slack_sdk.web.async_client import AsyncWebClient
 
 from agent import run_casey_agent
-from conversation import session_store
+from thread_context import session_store
 from listeners.views.feedback_block import create_feedback_block
 
 

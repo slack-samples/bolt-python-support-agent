@@ -202,6 +202,6 @@ The `deps.py` file defines the `CaseyDeps` dataclass passed to the agent at runt
 
 The `tools` directory contains five IT helpdesk tools that the agent can call during a conversation.
 
-### `/conversation`
+### `/thread_context`
 
 The `store.py` file implements a thread-safe in-memory conversation history store, keyed by channel and thread. This enables multi-turn conversations where Casey remembers previous context within a thread.
