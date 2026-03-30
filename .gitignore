@@ -3,3 +3,6 @@
 
 # bolt-python build scratch (used by /project:update-bolt command)
 .bolt-python-build/
+
+# Git
+.worktrees/
