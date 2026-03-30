@@ -3,6 +3,7 @@ import re
 from logging import Logger
 
 from slack_bolt.agent.async_agent import AsyncBoltAgent
+from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.context.say.async_say import AsyncSay
 from slack_sdk.web.async_client import AsyncWebClient
 
@@ -24,18 +25,19 @@ CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 async def handle_app_mentioned(
     client: AsyncWebClient,
-    event: dict,
     agent: AsyncBoltAgent,
+    context: AsyncBoltContext,
+    event: dict,
     logger: Logger,
     say: AsyncSay,
 ):
     """Handle @Casey mentions in channels."""
     try:
-        channel_id = event["channel"]
-        team_id = event.get("team")
+        channel_id = context.channel_id
+        team_id = context.team_id
         text = event.get("text", "")
         thread_ts = event.get("thread_ts") or event["ts"]
-        user_id = event.get("user")
+        user_id = context.user_id
 
         # Strip the bot mention from the text
         cleaned_text = re.sub(r"<@[A-Z0-9]+>", "", text).strip()

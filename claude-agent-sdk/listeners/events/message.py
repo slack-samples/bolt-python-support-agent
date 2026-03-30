@@ -2,6 +2,7 @@ import random
 from logging import Logger
 
 from slack_bolt.agent.async_agent import AsyncBoltAgent
+from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.context.say.async_say import AsyncSay
 from slack_sdk.web.async_client import AsyncWebClient
 
@@ -23,8 +24,9 @@ CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 async def handle_message(
     client: AsyncWebClient,
-    event: dict,
     agent: AsyncBoltAgent,
+    context: AsyncBoltContext,
+    event: dict,
     logger: Logger,
     say: AsyncSay,
 ):
@@ -38,7 +40,7 @@ async def handle_message(
         return
 
     try:
-        channel_id = event["channel"]
+        channel_id = context.channel_id
         text = event.get("text", "")
         thread_ts = event.get("thread_ts") or event["ts"]
 

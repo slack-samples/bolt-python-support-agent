@@ -3,18 +3,18 @@ name = "bolt-python-support-agent-claude"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
-    "slack-sdk==3.40.1",
+    "slack-sdk==3.41.0",
     # slack-bolt is installed from a vendored whl — see ../vendor/
     "slack-cli-hooks<1.0.0",
     "claude-agent-sdk>=0.1.36",
     "aiohttp>=3.13.3",
-    "python-dotenv==1.2.1",
+    "python-dotenv==1.2.2",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest",
-    "ruff==0.15.2",
+    "ruff==0.15.8",
 ]
 
 [tool.setuptools.packages.find]

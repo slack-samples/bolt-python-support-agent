@@ -1,7 +1,7 @@
 from logging import Logger
 
 from agents import Runner
-from slack_bolt import Ack, BoltAgent
+from slack_bolt import Ack, BoltAgent, BoltContext
 from slack_sdk import WebClient
 
 from agent import CaseyDeps, casey_agent
@@ -10,14 +10,19 @@ from listeners.views.feedback_block import create_feedback_block
 
 
 def handle_issue_submission(
-    ack: Ack, body: dict, client: WebClient, agent: BoltAgent, logger: Logger
+    ack: Ack,
+    agent: BoltAgent,
+    body: dict,
+    client: WebClient,
+    context: BoltContext,
+    logger: Logger,
 ):
     """Handle modal submission: open DM, post issue, and run Casey agent."""
     ack()
 
     try:
-        team_id = body["user"]["team_id"]
-        user_id = body["user"]["id"]
+        team_id = context.team_id
+        user_id = context.user_id
         values = body["view"]["state"]["values"]
         category = values["category_block"]["category_select"]["selected_option"][
             "value"

@@ -2,6 +2,7 @@ from logging import Logger
 
 from slack_bolt import Ack
 from slack_bolt.agent.async_agent import AsyncBoltAgent
+from slack_bolt.context.async_context import AsyncBoltContext
 from slack_sdk.web.async_client import AsyncWebClient
 
 from agent import run_casey_agent
@@ -10,14 +11,19 @@ from listeners.views.feedback_block import create_feedback_block
 
 
 async def handle_issue_submission(
-    ack: Ack, body: dict, client: AsyncWebClient, agent: AsyncBoltAgent, logger: Logger
+    ack: Ack,
+    agent: AsyncBoltAgent,
+    body: dict,
+    client: AsyncWebClient,
+    context: AsyncBoltContext,
+    logger: Logger,
 ):
     """Handle modal submission: open DM, post issue, and run Casey agent."""
     await ack()
 
     try:
-        team_id = body["user"]["team_id"]
-        user_id = body["user"]["id"]
+        team_id = context.team_id
+        user_id = context.user_id
         values = body["view"]["state"]["values"]
         category = values["category_block"]["category_select"]["selected_option"][
             "value"

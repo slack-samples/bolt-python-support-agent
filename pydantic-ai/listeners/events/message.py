@@ -1,7 +1,7 @@
 import random
 from logging import Logger
 
-from slack_bolt import BoltAgent, Say
+from slack_bolt import BoltAgent, BoltContext, Say
 from slack_sdk import WebClient
 
 from agent import DEFAULT_MODEL, CaseyDeps, casey_agent
@@ -21,7 +21,12 @@ CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 
 def handle_message(
-    client: WebClient, event: dict, agent: BoltAgent, logger: Logger, say: Say
+    agent: BoltAgent,
+    client: WebClient,
+    context: BoltContext,
+    event: dict,
+    logger: Logger,
+    say: Say,
 ):
     """Handle direct messages sent to Casey."""
     # Skip bot messages and message subtypes (edits, deletes, etc.)
@@ -33,10 +38,10 @@ def handle_message(
         return
 
     try:
-        channel_id = event["channel"]
+        channel_id = context.channel_id
         text = event.get("text", "")
         thread_ts = event.get("thread_ts") or event["ts"]
-        user_id = event["user"]
+        user_id = context.user_id
 
         # Get conversation history
         history = conversation_store.get_history(channel_id, thread_ts)
