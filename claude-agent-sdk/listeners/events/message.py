@@ -1,9 +1,10 @@
 import random
 from logging import Logger
 
-from slack_bolt.agent.async_agent import AsyncBoltAgent
 from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.context.say.async_say import AsyncSay
+from slack_bolt.context.say_stream.async_say_stream import AsyncSayStream
+from slack_bolt.context.set_status.async_set_status import AsyncSetStatus
 from slack_sdk.web.async_client import AsyncWebClient
 
 from agent import run_casey_agent
@@ -24,11 +25,12 @@ CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 async def handle_message(
     client: AsyncWebClient,
-    agent: AsyncBoltAgent,
     context: AsyncBoltContext,
     event: dict,
     logger: Logger,
     say: AsyncSay,
+    say_stream: AsyncSayStream,
+    set_status: AsyncSetStatus,
 ):
     """Handle direct messages sent to Casey."""
     # Skip bot messages and message subtypes (edits, deletes, etc.)
@@ -56,9 +58,7 @@ async def handle_message(
             )
 
         # Set assistant thread status with loading messages
-        await client.assistant_threads_setStatus(
-            channel_id=channel_id,
-            thread_ts=thread_ts,
+        await set_status(
             status="Thinking...",
             loading_messages=[
                 "Teaching the hamsters to type faster…",
@@ -75,7 +75,7 @@ async def handle_message(
         )
 
         # Stream response in thread with feedback buttons
-        streamer = await agent.chat_stream()
+        streamer = await say_stream()
         await streamer.append(markdown_text=response_text)
         feedback_blocks = create_feedback_block()
         await streamer.stop(blocks=feedback_blocks)

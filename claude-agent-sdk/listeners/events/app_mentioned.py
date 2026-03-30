@@ -2,9 +2,10 @@ import random
 import re
 from logging import Logger
 
-from slack_bolt.agent.async_agent import AsyncBoltAgent
 from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.context.say.async_say import AsyncSay
+from slack_bolt.context.say_stream.async_say_stream import AsyncSayStream
+from slack_bolt.context.set_status.async_set_status import AsyncSetStatus
 from slack_sdk.web.async_client import AsyncWebClient
 
 from agent import run_casey_agent
@@ -25,19 +26,18 @@ CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 async def handle_app_mentioned(
     client: AsyncWebClient,
-    agent: AsyncBoltAgent,
     context: AsyncBoltContext,
     event: dict,
     logger: Logger,
     say: AsyncSay,
+    say_stream: AsyncSayStream,
+    set_status: AsyncSetStatus,
 ):
     """Handle @Casey mentions in channels."""
     try:
         channel_id = context.channel_id
-        team_id = context.team_id
         text = event.get("text", "")
         thread_ts = event.get("thread_ts") or event["ts"]
-        user_id = context.user_id
 
         # Strip the bot mention from the text
         cleaned_text = re.sub(r"<@[A-Z0-9]+>", "", text).strip()
@@ -58,9 +58,7 @@ async def handle_app_mentioned(
             )
 
         # Set assistant thread status with loading messages
-        await client.assistant_threads_setStatus(
-            channel_id=channel_id,
-            thread_ts=thread_ts,
+        await set_status(
             status="Thinking...",
             loading_messages=[
                 "Teaching the hamsters to type faster…",
@@ -80,12 +78,7 @@ async def handle_app_mentioned(
         )
 
         # Stream response in thread with feedback buttons
-        streamer = await agent.chat_stream(
-            channel=channel_id,
-            recipient_team_id=team_id,  # chat_stream helper cannot infer event["team"] from client
-            recipient_user_id=user_id,
-            thread_ts=thread_ts,
-        )
+        streamer = await say_stream()
         await streamer.append(markdown_text=response_text)
         feedback_blocks = create_feedback_block()
         await streamer.stop(blocks=feedback_blocks)
