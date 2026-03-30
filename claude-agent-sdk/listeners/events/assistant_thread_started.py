@@ -1,6 +1,8 @@
 from logging import Logger
 
-from slack_sdk.web.async_client import AsyncWebClient
+from slack_bolt.context.set_suggested_prompts.async_set_suggested_prompts import (
+    AsyncSetSuggestedPrompts,
+)
 
 SUGGESTED_PROMPTS = [
     {"title": "Reset Password", "message": "I need to reset my password"},
@@ -10,19 +12,13 @@ SUGGESTED_PROMPTS = [
 
 
 async def handle_assistant_thread_started(
-    client: AsyncWebClient, event: dict, logger: Logger
+    set_suggested_prompts: AsyncSetSuggestedPrompts, logger: Logger
 ):
     """Handle assistant thread started events by setting suggested prompts."""
-    assistant_thread = event.get("assistant_thread", {})
-    channel_id = assistant_thread.get("channel_id")
-    thread_ts = assistant_thread.get("thread_ts")
-
     try:
-        await client.assistant_threads_setSuggestedPrompts(
-            channel_id=channel_id,
-            thread_ts=thread_ts,
-            title="How can I help you today?",
+        await set_suggested_prompts(
             prompts=SUGGESTED_PROMPTS,
+            title="How can I help you today?",
         )
     except Exception as e:
         logger.exception(f"Failed to handle assistant thread started: {e}")
