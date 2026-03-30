@@ -1,6 +1,7 @@
 import random
 from logging import Logger
 
+from slack_bolt.agent.async_agent import AsyncBoltAgent
 from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.context.say.async_say import AsyncSay
 from slack_sdk.web.async_client import AsyncWebClient
@@ -23,6 +24,7 @@ CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 async def handle_message(
     client: AsyncWebClient,
+    agent: AsyncBoltAgent,
     context: AsyncBoltContext,
     event: dict,
     logger: Logger,
@@ -39,10 +41,8 @@ async def handle_message(
 
     try:
         channel_id = context.channel_id
-        team_id = context.team_id
         text = event.get("text", "")
         thread_ts = event.get("thread_ts") or event["ts"]
-        user_id = context.user_id
 
         # Get session ID for conversation context
         existing_session_id = session_store.get_session(channel_id, thread_ts)
@@ -75,12 +75,7 @@ async def handle_message(
         )
 
         # Stream response in thread with feedback buttons
-        streamer = await client.chat_stream(
-            channel=channel_id,
-            recipient_team_id=team_id,
-            recipient_user_id=user_id,
-            thread_ts=thread_ts,
-        )
+        streamer = await agent.chat_stream()
         await streamer.append(markdown_text=response_text)
         feedback_blocks = create_feedback_block()
         await streamer.stop(blocks=feedback_blocks)

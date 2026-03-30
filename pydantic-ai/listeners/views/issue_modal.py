@@ -1,6 +1,6 @@
 from logging import Logger
 
-from slack_bolt import Ack, BoltContext
+from slack_bolt import Ack, BoltAgent, BoltContext
 from slack_sdk import WebClient
 
 from agent import DEFAULT_MODEL, CaseyDeps, casey_agent
@@ -9,7 +9,12 @@ from listeners.views.feedback_block import create_feedback_block
 
 
 def handle_issue_submission(
-    ack: Ack, body: dict, client: WebClient, context: BoltContext, logger: Logger
+    ack: Ack,
+    agent: BoltAgent,
+    body: dict,
+    client: WebClient,
+    context: BoltContext,
+    logger: Logger,
 ):
     """Handle modal submission: open DM, post issue, and run Casey agent."""
     ack()
@@ -66,7 +71,7 @@ def handle_issue_submission(
         result = casey_agent.run_sync(user_message, model=DEFAULT_MODEL, deps=deps)
 
         # Stream the response in thread with feedback buttons
-        streamer = client.chat_stream(
+        streamer = agent.chat_stream(
             channel=channel_id,
             recipient_team_id=team_id,
             recipient_user_id=user_id,

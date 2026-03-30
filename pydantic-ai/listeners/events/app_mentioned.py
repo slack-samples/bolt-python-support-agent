@@ -2,7 +2,7 @@ import random
 import re
 from logging import Logger
 
-from slack_bolt import BoltContext, Say
+from slack_bolt import BoltAgent, BoltContext, Say
 from slack_sdk import WebClient
 
 from agent import DEFAULT_MODEL, CaseyDeps, casey_agent
@@ -22,7 +22,12 @@ CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 
 def handle_app_mentioned(
-    client: WebClient, context: BoltContext, event: dict, logger: Logger, say: Say
+    agent: BoltAgent,
+    client: WebClient,
+    context: BoltContext,
+    event: dict,
+    logger: Logger,
+    say: Say,
 ):
     """Handle @Casey mentions in channels."""
     try:
@@ -82,9 +87,9 @@ def handle_app_mentioned(
         )
 
         # Stream response in thread with feedback buttons
-        streamer = client.chat_stream(
+        streamer = agent.chat_stream(
             channel=channel_id,
-            recipient_team_id=team_id,
+            recipient_team_id=team_id,  # chat_stream helper cannot infer event["team"] from client
             recipient_user_id=user_id,
             thread_ts=thread_ts,
         )
