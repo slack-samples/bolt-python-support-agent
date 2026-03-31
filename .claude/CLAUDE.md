@@ -66,11 +66,11 @@ Each sub-package has a `register(app)` function called from `listeners/__init__.
 | Agent file | `agent/casey.py` | `agent/support_agent.py` | `agent/casey.py` |
 | App type | `AsyncApp` (fully async) | `App` (sync) | `App` (sync) |
 | Agent definition | `ClaudeSDKClient` with `ClaudeAgentOptions` | `Agent[CaseyDeps](model="gpt-4.1-mini")` | `Agent(deps_type=CaseyDeps)` |
-| Model config | Managed by SDK (Claude models) | Set directly on agent constructor | Passed at runtime via `run_sync(model=DEFAULT_MODEL)` |
+| Model config | Managed by SDK (Claude models) | Set directly on agent constructor | `get_model()` selects provider at runtime (Anthropic preferred) |
 | Tool definition | `@tool` decorated functions via MCP server | `@function_tool` decorated functions | Plain async functions |
 | Tool context param | `args` dict (no context param) | `RunContextWrapper[CaseyDeps]` | `RunContext[CaseyDeps]` |
 | Execution | `await run_casey_agent(text, session_id=...)` | `Runner.run_sync(casey_agent, input=..., context=...)` | `casey_agent.run_sync(text, model=..., deps=..., message_history=...)` |
 | Result output | `response_text` from collected `TextBlock.text` | `result.final_output` | `result.output` |
 | Conversation history | Session-based via `resume` (server-side) | `list` stored locally | `list[ModelMessage]` stored locally |
-| API key env var | `ANTHROPIC_API_KEY` | `OPENAI_API_KEY` | `OPENAI_API_KEY` |
+| API key env var | `ANTHROPIC_API_KEY` | `OPENAI_API_KEY` | `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` |
 | Feedback blocks | Native `FeedbackButtonsElement` | Native `FeedbackButtonsElement` | Native `FeedbackButtonsElement` |

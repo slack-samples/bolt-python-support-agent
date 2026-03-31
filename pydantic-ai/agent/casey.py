@@ -1,3 +1,5 @@
+import os
+
 from pydantic_ai import Agent
 
 from agent.deps import CaseyDeps
@@ -72,7 +74,29 @@ Call this once when the issue is fully resolved (password reset done, ticket cre
 - If unsure about a user's issue, ask clarifying questions before taking action
 """
 
-DEFAULT_MODEL = "openai:gpt-4.1-mini"
+_cached_model: str | None = None
+
+
+def get_model() -> str:
+    """Select the AI model based on available API keys.
+
+    Prefers Anthropic when both keys are set.
+    """
+    global _cached_model
+    if _cached_model is not None:
+        return _cached_model
+
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        _cached_model = "anthropic:claude-sonnet-4-6"
+    elif os.environ.get("OPENAI_API_KEY"):
+        _cached_model = "openai:gpt-4.1-mini"
+    else:
+        raise RuntimeError(
+            "No AI provider configured. "
+            "Set ANTHROPIC_API_KEY or OPENAI_API_KEY in your environment."
+        )
+    return _cached_model
+
 
 casey_agent = Agent(
     deps_type=CaseyDeps,

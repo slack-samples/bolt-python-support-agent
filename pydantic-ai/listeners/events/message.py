@@ -3,7 +3,7 @@ from logging import Logger
 from slack_bolt import BoltContext, Say, SayStream, SetStatus
 from slack_sdk import WebClient
 
-from agent import DEFAULT_MODEL, CaseyDeps, casey_agent
+from agent import CaseyDeps, casey_agent, get_model
 from thread_context import conversation_store
 from listeners.views.feedback_block import create_feedback_block
 
@@ -85,7 +85,7 @@ def handle_message(
         )
         result = casey_agent.run_sync(
             text,
-            model=DEFAULT_MODEL,
+            model=get_model(),
             deps=deps,
             message_history=history,
         )

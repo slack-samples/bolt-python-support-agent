@@ -3,7 +3,7 @@ from logging import Logger
 from slack_bolt import Ack, BoltContext
 from slack_sdk import WebClient
 
-from agent import DEFAULT_MODEL, CaseyDeps, casey_agent
+from agent import CaseyDeps, casey_agent, get_model
 from thread_context import conversation_store
 from listeners.views.feedback_block import create_feedback_block
 
@@ -67,7 +67,7 @@ def handle_issue_submission(
             channel_id=channel_id,
             thread_ts=thread_ts,
         )
-        result = casey_agent.run_sync(user_message, model=DEFAULT_MODEL, deps=deps)
+        result = casey_agent.run_sync(user_message, model=get_model(), deps=deps)
 
         # Stream the response in thread with feedback buttons
         streamer = client.chat_stream(
