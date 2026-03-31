@@ -20,13 +20,28 @@ async def handle_message(
     say_stream: AsyncSayStream,
     set_status: AsyncSetStatus,
 ):
-    """Handle direct messages sent to Casey."""
+    """Handle messages sent to Casey via DM or in threads the bot is part of."""
     # Skip bot messages and message subtypes (edits, deletes, etc.)
     if event.get("bot_id") or event.get("subtype"):
+        logger.debug(f"Skipping message: bot_id={event.get('bot_id')}, subtype={event.get('subtype')}")
         return
 
-    # Only handle IM channel type
-    if event.get("channel_type") != "im":
+    is_dm = event.get("channel_type") == "im"
+    is_thread_reply = event.get("thread_ts") is not None
+    logger.debug(f"Message received: is_dm={is_dm}, is_thread_reply={is_thread_reply}, channel={context.channel_id}, thread_ts={event.get('thread_ts')}")
+
+    if is_dm:
+        logger.debug("Handling as DM")
+    elif is_thread_reply:
+        # Channel thread replies are handled only if the bot is already engaged
+        session = session_store.get_session(context.channel_id, event["thread_ts"])
+        logger.debug(f"Thread reply: has_session={session is not None}")
+        if session is None:
+            logger.debug("Skipping thread reply — bot not engaged in this thread")
+            return
+    else:
+        # Top-level channel messages are handled by app_mentioned
+        logger.debug("Skipping top-level channel message")
         return
 
     try:
@@ -37,8 +52,9 @@ async def handle_message(
         # Get session ID for conversation context
         existing_session_id = session_store.get_session(channel_id, thread_ts)
 
-        # Add eyes reaction only to the first message in a thread
-        if not existing_session_id:
+        # Add eyes reaction only to the first message (DMs only — channel
+        # threads already have the reaction from the initial app_mention)
+        if is_dm and not existing_session_id:
             await client.reactions_add(
                 channel=channel_id,
                 timestamp=event["ts"],
@@ -80,7 +96,7 @@ async def handle_message(
             session_store.set_session(channel_id, thread_ts, new_session_id)
 
     except Exception as e:
-        logger.exception(f"Failed to handle DM: {e}")
+        logger.exception(f"Failed to handle message: {e}")
         await say(
             text=f":warning: Something went wrong! ({e})",
             thread_ts=event.get("thread_ts") or event.get("ts"),
