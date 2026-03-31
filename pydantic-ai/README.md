@@ -2,7 +2,7 @@
 
 Meet Casey (it/this/that) — an AI-powered IT helpdesk agent that lives in Slack. Casey can troubleshoot common issues, search knowledge base articles, reset passwords, check system status, and create support tickets, all without leaving the conversation.
 
-Built with [Bolt for Python](https://docs.slack.dev/tools/bolt-python/) and [Pydantic AI](https://ai.pydantic.dev/) using models from [OpenAI](https://openai.com).
+Built with [Bolt for Python](https://docs.slack.dev/tools/bolt-python/) and [Pydantic AI](https://ai.pydantic.dev/) using models from [Anthropic](https://anthropic.com) or [OpenAI](https://openai.com).
 
 ## App Overview
 
@@ -105,9 +105,23 @@ pip install -r requirements.txt
 
 ## Providers
 
+This app supports both Anthropic and OpenAI as AI providers. Set at least one API key — if both are set, Anthropic is used by default.
+
+### Anthropic Setup
+
+Uses Anthropic's `claude-sonnet-4-6` model through Pydantic AI.
+
+1. Create an API key from your [Anthropic dashboard](https://console.anthropic.com/settings/keys).
+1. Rename `.env.sample` to `.env`.
+3. Save the Anthropic API key to `.env`:
+
+```sh
+ANTHROPIC_API_KEY=YOUR_ANTHROPIC_API_KEY
+```
+
 ### OpenAI Setup
 
-This app uses OpenAI's `gpt-4.1-mini` model through Pydantic AI.
+Uses OpenAI's `gpt-4.1-mini` model through Pydantic AI.
 
 1. Create an API key from your [OpenAI dashboard](https://platform.openai.com/api-keys).
 1. Rename `.env.sample` to `.env`.
