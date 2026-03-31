@@ -1,4 +1,3 @@
-import random
 from logging import Logger
 
 from slack_bolt import BoltContext, Say, SayStream, SetStatus
@@ -7,17 +6,6 @@ from slack_sdk import WebClient
 from agent import DEFAULT_MODEL, CaseyDeps, casey_agent
 from thread_context import conversation_store
 from listeners.views.feedback_block import create_feedback_block
-
-RESOLUTION_PHRASES = [
-    "resolved",
-    "that should fix",
-    "you're all set",
-    "should be working now",
-    "has been reset",
-    "ticket created",
-]
-
-CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 
 def handle_message(
@@ -73,6 +61,7 @@ def handle_message(
             user_id=user_id,
             channel_id=channel_id,
             thread_ts=thread_ts,
+            message_ts=event["ts"],
         )
         result = casey_agent.run_sync(
             text,
@@ -89,24 +78,6 @@ def handle_message(
 
         # Store conversation history
         conversation_store.set_history(channel_id, thread_ts, result.all_messages())
-
-        # ~30% chance contextual emoji
-        if random.random() < 0.3:
-            emoji = random.choice(CONTEXTUAL_EMOJIS)
-            client.reactions_add(
-                channel=channel_id,
-                timestamp=event["ts"],
-                name=emoji,
-            )
-
-        # Check for resolution phrases
-        output_lower = result.output.lower()
-        if any(phrase in output_lower for phrase in RESOLUTION_PHRASES):
-            client.reactions_add(
-                channel=channel_id,
-                timestamp=event["ts"],
-                name="white_check_mark",
-            )
 
     except Exception as e:
         logger.exception(f"Failed to handle DM: {e}")

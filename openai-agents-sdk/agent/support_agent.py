@@ -2,6 +2,7 @@ from agents import Agent
 
 from agent.deps import CaseyDeps
 from agent.tools import (
+    add_emoji_reaction,
     check_system_status,
     create_support_ticket,
     lookup_user_permissions,
@@ -54,6 +55,17 @@ BAD: "OMG this is so frustrating!!!" (too emotional)
 - Create a ticket when the user has already tried the KB steps and they didn't work
 - For access requests, verify the system name and create a ticket with the details
 
+## EMOJI REACTIONS
+After responding, you may react to the user's message with add_emoji_reaction.
+- You can react to multiple messages within a thread — that's encouraged when it fits
+- `white_check_mark` is reserved for the parent message only (on_parent_message=true) — use it \
+once when the issue is fully resolved (password reset done, ticket created, problem fixed)
+- Never use `white_check_mark` on messages inside the thread
+- For positive progress inside a thread (e.g. a step worked, info confirmed), use `+1` on the current message
+- Match contextual emoji to the tone: `pray` for gratitude, `wrench` for fixes, `key` for login issues, \
+`rotating_light` for urgency, `tada` for celebrations, `thinking_face` for confusion
+- Do not use `eyes` — it is added automatically
+
 ## BOUNDARIES
 - You are an IT helpdesk agent only — politely redirect non-IT questions
 - Do not make up system statuses or ticket numbers — always use the provided tools
@@ -65,6 +77,7 @@ casey_agent = Agent[CaseyDeps](
     name="Casey",
     instructions=CASEY_SYSTEM_PROMPT,
     tools=[
+        add_emoji_reaction,
         search_knowledge_base,
         create_support_ticket,
         trigger_password_reset,

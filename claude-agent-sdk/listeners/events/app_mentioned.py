@@ -1,4 +1,3 @@
-import random
 import re
 from logging import Logger
 
@@ -8,20 +7,9 @@ from slack_bolt.context.say_stream.async_say_stream import AsyncSayStream
 from slack_bolt.context.set_status.async_set_status import AsyncSetStatus
 from slack_sdk.web.async_client import AsyncWebClient
 
-from agent import run_casey_agent
+from agent import CaseyDeps, run_casey_agent
 from thread_context import session_store
 from listeners.views.feedback_block import create_feedback_block
-
-RESOLUTION_PHRASES = [
-    "resolved",
-    "that should fix",
-    "you're all set",
-    "should be working now",
-    "has been reset",
-    "ticket created",
-]
-
-CONTEXTUAL_EMOJIS = ["+1", "raised_hands", "rocket", "tada", "bulb", "fire"]
 
 
 async def handle_app_mentioned(
@@ -72,9 +60,16 @@ async def handle_app_mentioned(
         # Get session ID for conversation context
         existing_session_id = session_store.get_session(channel_id, thread_ts)
 
-        # Run the agent
+        # Run the agent with deps for tool access
+        deps = CaseyDeps(
+            client=client,
+            user_id=context.user_id,
+            channel_id=channel_id,
+            thread_ts=thread_ts,
+            message_ts=event["ts"],
+        )
         response_text, new_session_id = await run_casey_agent(
-            cleaned_text, session_id=existing_session_id
+            cleaned_text, session_id=existing_session_id, deps=deps
         )
 
         # Stream response in thread with feedback buttons
@@ -86,24 +81,6 @@ async def handle_app_mentioned(
         # Store session ID for future context
         if new_session_id:
             session_store.set_session(channel_id, thread_ts, new_session_id)
-
-        # ~20% chance contextual emoji (lower than DM to be less noisy)
-        if random.random() < 0.2:
-            emoji = random.choice(CONTEXTUAL_EMOJIS)
-            await client.reactions_add(
-                channel=channel_id,
-                timestamp=event["ts"],
-                name=emoji,
-            )
-
-        # Check for resolution phrases
-        output_lower = response_text.lower()
-        if any(phrase in output_lower for phrase in RESOLUTION_PHRASES):
-            await client.reactions_add(
-                channel=channel_id,
-                timestamp=event["ts"],
-                name="white_check_mark",
-            )
 
     except Exception as e:
         logger.exception(f"Failed to handle app mention: {e}")
