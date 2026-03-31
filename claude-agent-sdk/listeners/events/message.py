@@ -23,12 +23,16 @@ async def handle_message(
     """Handle messages sent to Casey via DM or in threads the bot is part of."""
     # Skip bot messages and message subtypes (edits, deletes, etc.)
     if event.get("bot_id") or event.get("subtype"):
-        logger.debug(f"Skipping message: bot_id={event.get('bot_id')}, subtype={event.get('subtype')}")
+        logger.debug(
+            f"Skipping message: bot_id={event.get('bot_id')}, subtype={event.get('subtype')}"
+        )
         return
 
     is_dm = event.get("channel_type") == "im"
     is_thread_reply = event.get("thread_ts") is not None
-    logger.debug(f"Message received: is_dm={is_dm}, is_thread_reply={is_thread_reply}, channel={context.channel_id}, thread_ts={event.get('thread_ts')}")
+    logger.debug(
+        f"Message received: is_dm={is_dm}, is_thread_reply={is_thread_reply}, channel={context.channel_id}, thread_ts={event.get('thread_ts')}"
+    )
 
     if is_dm:
         logger.debug("Handling as DM")

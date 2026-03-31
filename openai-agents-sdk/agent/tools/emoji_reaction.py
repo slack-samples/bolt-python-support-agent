@@ -1,3 +1,5 @@
+import random
+
 from agents import function_tool
 from agents.run_context import RunContextWrapper
 from slack_sdk.errors import SlackApiError
@@ -10,9 +12,9 @@ async def add_emoji_reaction(
     wrapper: RunContextWrapper[CaseyDeps],
     emoji_name: str,
 ) -> str:
-    """Add an emoji reaction to the user's current message to acknowledge their sentiment.
+    """Add an emoji reaction to the user's current message to acknowledge the topic.
 
-    Choose an emoji that matches the tone. Suggested emojis by category:
+    Choose an emoji that matches the subject matter. Suggested emojis by category:
     - Gratitude/praise: pray, bow, blush, sparkles, star-struck, heart
     - Frustration/confusion: thinking_face, face_with_monocle, sweat_smile, upside_down_face
     - Login/password: key, lock, closed_lock_with_key
@@ -30,6 +32,12 @@ async def add_emoji_reaction(
         emoji_name: The Slack emoji name without colons (e.g. 'tada', 'wrench', 'pray').
     """
     deps = wrapper.context.deps
+
+    # Skip ~30% of reactions to feel more natural
+    if random.random() < 0.3:
+        return (
+            f"Skipped :{emoji_name}: reaction (randomly omitted to avoid over-reacting)"
+        )
 
     try:
         deps.client.reactions_add(

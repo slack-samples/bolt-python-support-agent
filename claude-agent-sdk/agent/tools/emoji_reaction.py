@@ -1,12 +1,14 @@
+import random
+
 from claude_agent_sdk import tool
 from slack_sdk.errors import SlackApiError
 
 from agent.context import casey_deps_var
 
 EMOJI_DESCRIPTION = """\
-Add an emoji reaction to the user's current message to acknowledge their sentiment.
+Add an emoji reaction to the user's current message to acknowledge the topic.
 
-Choose an emoji that matches the tone. Suggested emojis by category:
+Choose an emoji that matches the subject matter. Suggested emojis by category:
 - Gratitude/praise: pray, bow, blush, sparkles, star-struck, heart
 - Frustration/confusion: thinking_face, face_with_monocle, sweat_smile, upside_down_face
 - Login/password: key, lock, closed_lock_with_key
@@ -40,6 +42,17 @@ async def add_emoji_reaction_tool(args):
     """Add an emoji reaction to the user's current message."""
     deps = casey_deps_var.get()
     emoji_name = args["emoji_name"]
+
+    # Skip ~30% of reactions to feel more natural
+    if random.random() < 0.3:
+        return {
+            "content": [
+                {
+                    "type": "text",
+                    "text": f"Skipped :{emoji_name}: reaction (randomly omitted to avoid over-reacting)",
+                }
+            ]
+        }
 
     try:
         await deps.client.reactions_add(
