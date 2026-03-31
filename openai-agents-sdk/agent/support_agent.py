@@ -78,12 +78,12 @@ casey_agent = Agent[CaseyDeps](
     instructions=CASEY_SYSTEM_PROMPT,
     tools=[
         add_emoji_reaction,
+        check_system_status,
+        create_support_ticket,
+        lookup_user_permissions,
         mark_resolved,
         search_knowledge_base,
-        create_support_ticket,
         trigger_password_reset,
-        check_system_status,
-        lookup_user_permissions,
     ],
     model="gpt-4.1-mini",
 )

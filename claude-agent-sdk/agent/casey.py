@@ -86,23 +86,23 @@ casey_tools_server = create_sdk_mcp_server(
     version="1.0.0",
     tools=[
         add_emoji_reaction_tool,
+        check_system_status_tool,
+        create_support_ticket_tool,
+        lookup_user_permissions_tool,
         mark_resolved_tool,
         search_knowledge_base_tool,
-        create_support_ticket_tool,
         trigger_password_reset_tool,
-        check_system_status_tool,
-        lookup_user_permissions_tool,
     ],
 )
 
 ALLOWED_TOOLS = [
     "add_emoji_reaction",
+    "check_system_status",
+    "create_support_ticket",
+    "lookup_user_permissions",
     "mark_resolved",
     "search_knowledge_base",
-    "create_support_ticket",
     "trigger_password_reset",
-    "check_system_status",
-    "lookup_user_permissions",
 ]
 
 
