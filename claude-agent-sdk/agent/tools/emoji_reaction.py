@@ -11,7 +11,7 @@ from agent.context import casey_deps_var
         "their sentiment. Choose an emoji that matches the tone: pray for "
         "gratitude, wrench for fixes, key for login issues, rotating_light "
         "for urgency, tada for celebrations, thinking_face for confusion, "
-        "+1 for positive progress. Do not use eyes (added automatically) "
+        "thumbs_up for positive progress, +1 for agreement. Do not use eyes (added automatically) "
         "or white_check_mark (reserved for mark_resolved)."
     ),
     input_schema={

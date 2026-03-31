@@ -14,8 +14,8 @@ async def add_emoji_reaction(
 
     Choose an emoji that matches the tone: pray for gratitude, wrench for fixes,
     key for login issues, rotating_light for urgency, tada for celebrations,
-    thinking_face for confusion, +1 for positive progress. Do not use eyes
-    (added automatically) or white_check_mark (reserved for mark_resolved).
+    thinking_face for confusion, thumbs_up for positive progress, +1 for agreement.
+    Do not use eyes (added automatically) or white_check_mark (reserved for mark_resolved).
 
     Args:
         emoji_name: The Slack emoji name without colons (e.g. 'tada', 'wrench', 'pray').
