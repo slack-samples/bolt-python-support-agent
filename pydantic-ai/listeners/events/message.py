@@ -29,27 +29,20 @@ def handle_message(
     if event.get("subtype"):
         return
     if event.get("bot_id") and not is_issue_submission:
-        logger.debug(f"Skipping bot message: bot_id={event.get('bot_id')}")
         return
 
     is_dm = event.get("channel_type") == "im"
     is_thread_reply = event.get("thread_ts") is not None
-    logger.debug(
-        f"Message received: is_dm={is_dm}, is_thread_reply={is_thread_reply}, channel={context.channel_id}, thread_ts={event.get('thread_ts')}"
-    )
 
     if is_dm:
-        logger.debug("Handling as DM")
+        pass
     elif is_thread_reply:
         # Channel thread replies are handled only if the bot is already engaged
         history = conversation_store.get_history(context.channel_id, event["thread_ts"])
-        logger.debug(f"Thread reply: has_history={history is not None}")
         if history is None:
-            logger.debug("Skipping thread reply — bot not engaged in this thread")
             return
     else:
         # Top-level channel messages are handled by app_mentioned
-        logger.debug("Skipping top-level channel message")
         return
 
     try:
