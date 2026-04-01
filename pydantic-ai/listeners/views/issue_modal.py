@@ -3,10 +3,6 @@ from logging import Logger
 from slack_bolt import Ack, BoltContext
 from slack_sdk import WebClient
 
-from agent import CaseyDeps, casey_agent, get_model
-from thread_context import conversation_store
-from listeners.views.feedback_block import create_feedback_block
-
 
 def handle_issue_submission(
     ack: Ack,
@@ -15,11 +11,14 @@ def handle_issue_submission(
     context: BoltContext,
     logger: Logger,
 ):
-    """Handle modal submission: open DM, post issue, and run Casey agent."""
+    """Handle modal submission: open DM and post the issue message.
+
+    The message event handler picks up the posted message (identified by
+    its ``issue_submission`` metadata) and runs the agent from there.
+    """
     ack()
 
     try:
-        team_id = context.team_id
         user_id = context.user_id
         values = body["view"]["state"]["values"]
         category = values["category_block"]["category_select"]["selected_option"][
@@ -31,57 +30,17 @@ def handle_issue_submission(
         dm = client.conversations_open(users=[user_id])
         channel_id = dm["channel"]["id"]
 
-        # Post the initial message with category and description
+        # Post the issue message with metadata so the message handler can
+        # identify it and run the agent on behalf of the original user
         user_message = f"*Category:* {category}\n*Description:* {description}"
-        initial = client.chat_postMessage(
+        client.chat_postMessage(
             channel=channel_id,
             text=user_message,
+            metadata={
+                "event_type": "issue_submission",
+                "event_payload": {"user_id": user_id},
+            },
         )
-        thread_ts = initial["ts"]
-
-        # Set assistant thread status with loading messages
-        client.assistant_threads_setStatus(
-            channel_id=channel_id,
-            thread_ts=thread_ts,
-            status="Thinking...",
-            loading_messages=[
-                "Teaching the hamsters to type faster…",
-                "Untangling the internet cables…",
-                "Consulting the office goldfish…",
-                "Polishing up the response just for you…",
-                "Convincing the AI to stop overthinking…",
-            ],
-        )
-
-        # Add eyes reaction
-        client.reactions_add(
-            channel=channel_id,
-            timestamp=thread_ts,
-            name="eyes",
-        )
-
-        # Run the agent
-        deps = CaseyDeps(
-            client=client,
-            user_id=user_id,
-            channel_id=channel_id,
-            thread_ts=thread_ts,
-        )
-        result = casey_agent.run_sync(user_message, model=get_model(), deps=deps)
-
-        # Stream the response in thread with feedback buttons
-        streamer = client.chat_stream(
-            channel=channel_id,
-            recipient_team_id=team_id,
-            recipient_user_id=user_id,
-            thread_ts=thread_ts,
-        )
-        streamer.append(markdown_text=result.output)
-        feedback_blocks = create_feedback_block()
-        streamer.stop(blocks=feedback_blocks)
-
-        # Store conversation history
-        conversation_store.set_history(channel_id, thread_ts, result.all_messages())
 
     except Exception as e:
         logger.exception(f"Failed to handle issue submission: {e}")

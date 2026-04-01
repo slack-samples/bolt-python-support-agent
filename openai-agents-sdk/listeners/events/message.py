@@ -19,11 +19,18 @@ def handle_message(
     set_status: SetStatus,
 ):
     """Handle messages sent to Casey via DM or in threads the bot is part of."""
-    # Skip bot messages and message subtypes (edits, deletes, etc.)
-    if event.get("bot_id") or event.get("subtype"):
-        logger.debug(
-            f"Skipping message: bot_id={event.get('bot_id')}, subtype={event.get('subtype')}"
-        )
+    # Issue submissions are posted by the bot with metadata so the message
+    # handler can run the agent on behalf of the original user.
+    is_issue_submission = (
+        event.get("metadata", {}).get("event_type") == "issue_submission"
+    )
+
+    # Skip message subtypes (edits, deletes, etc.) and bot messages that
+    # are not issue submissions.
+    if event.get("subtype"):
+        return
+    if event.get("bot_id") and not is_issue_submission:
+        logger.debug(f"Skipping bot message: bot_id={event.get('bot_id')}")
         return
 
     is_dm = event.get("channel_type") == "im"
@@ -50,7 +57,13 @@ def handle_message(
         channel_id = context.channel_id
         text = event.get("text", "")
         thread_ts = event.get("thread_ts") or event["ts"]
-        user_id = context.user_id
+
+        # For issue submissions the bot posted the message, so the real
+        # user_id comes from the metadata rather than the event context.
+        if is_issue_submission:
+            user_id = event["metadata"]["event_payload"]["user_id"]
+        else:
+            user_id = context.user_id
 
         # Get conversation history
         history = conversation_store.get_history(channel_id, thread_ts)

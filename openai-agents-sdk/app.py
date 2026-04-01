@@ -18,6 +18,9 @@ app = App(
         base_url=os.environ.get("SLACK_API_URL", "https://slack.com/api"),
         token=os.environ.get("SLACK_BOT_TOKEN"),
     ),
+    # Allow bot-posted messages (e.g. issue modal submissions with metadata)
+    # to reach the message handler instead of being silently dropped
+    ignoring_self_events_enabled=False,
 )
 
 register_listeners(app)
