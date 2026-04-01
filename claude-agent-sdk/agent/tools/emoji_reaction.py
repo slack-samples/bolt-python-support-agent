@@ -8,7 +8,9 @@ from agent.context import casey_deps_var
 EMOJI_DESCRIPTION = """\
 Add an emoji reaction to the user's current message to acknowledge the topic.
 
-Choose an emoji that matches the subject matter. Suggested emojis by category:
+Use any standard Slack emoji that matches the topic or tone of the message. \
+Be creative and specific — if someone mentions a dog, use `dog`; if they sound \
+frustrated, use `sweat_smile`. The examples below are common picks, not the full set:
 - Gratitude/praise: pray, bow, blush, sparkles, star-struck, heart
 - Frustration/confusion: thinking_face, face_with_monocle, sweat_smile, upside_down_face
 - Login/password: key, lock, closed_lock_with_key
@@ -43,8 +45,8 @@ async def add_emoji_reaction_tool(args):
     deps = casey_deps_var.get()
     emoji_name = args["emoji_name"]
 
-    # Skip ~30% of reactions to feel more natural
-    if random.random() < 0.3:
+    # Skip ~10% of reactions to feel more natural
+    if random.random() < 0.1:
         return {
             "content": [
                 {
