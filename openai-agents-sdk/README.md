@@ -48,7 +48,7 @@ slack login
 #### Initializing the project
 
 ```sh
-slack create my-casey-agent --template slack-samples/bolt-python-support-agent-openai-agentkit
+slack create my-casey-agent --template slack-samples/bolt-python-support-agent
 cd my-casey-agent
 ```
 
@@ -84,7 +84,7 @@ SLACK_APP_TOKEN=YOUR_SLACK_APP_TOKEN
 #### Initializing the project
 
 ```sh
-git clone https://github.com/slack-samples/bolt-python-support-agent-openai-agentkit.git my-casey-agent
+git clone https://github.com/slack-samples/bolt-python-support-agent.git my-casey-agent
 cd my-casey-agent
 ```
 

@@ -36,12 +36,13 @@ def handle_app_mentioned(
             )
             return
 
-        # Add eyes reaction
-        client.reactions_add(
-            channel=channel_id,
-            timestamp=event["ts"],
-            name="eyes",
-        )
+        # Add eyes reaction only to the first message (not threaded replies)
+        if not event.get("thread_ts"):
+            client.reactions_add(
+                channel=channel_id,
+                timestamp=event["ts"],
+                name="eyes",
+            )
 
         # Set assistant thread status with loading messages
         set_status(
