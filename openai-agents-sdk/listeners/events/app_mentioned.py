@@ -6,6 +6,7 @@ from slack_bolt import BoltContext, Say, SayStream, SetStatus
 from slack_sdk import WebClient
 
 from agent import CaseyDeps, casey_agent
+from listeners.plan_streamer import CaseyPlanHooks, PlanStreamer
 from thread_context import conversation_store
 from listeners.views.feedback_block import create_feedback_block
 
@@ -72,10 +73,12 @@ def handle_app_mentioned(
             thread_ts=thread_ts,
             message_ts=event["ts"],
         )
-        result = Runner.run_sync(casey_agent, input=input_items, context=deps)
-
-        # Stream response in thread with feedback buttons
-        streamer = say_stream()
+        # Stream response with plan display mode for tool visibility
+        streamer = say_stream(task_display_mode="plan")
+        plan = PlanStreamer(streamer)
+        result = Runner.run_sync(
+            casey_agent, input=input_items, context=deps, hooks=CaseyPlanHooks(plan)
+        )
         streamer.append(markdown_text=result.final_output)
         feedback_blocks = create_feedback_block()
         streamer.stop(blocks=feedback_blocks)

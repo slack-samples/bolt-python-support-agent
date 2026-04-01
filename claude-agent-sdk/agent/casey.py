@@ -1,11 +1,20 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from claude_agent_sdk import (
     AssistantMessage,
     ClaudeAgentOptions,
     ClaudeSDKClient,
     ResultMessage,
     TextBlock,
+    ToolResultBlock,
+    ToolUseBlock,
     create_sdk_mcp_server,
 )
+
+if TYPE_CHECKING:
+    from listeners.plan_streamer import AsyncPlanStreamer
 
 from agent.context import casey_deps_var
 from agent.deps import CaseyDeps
@@ -109,6 +118,7 @@ async def run_casey_agent(
     text: str,
     session_id: str | None = None,
     deps: CaseyDeps | None = None,
+    plan_streamer: AsyncPlanStreamer | None = None,
 ) -> tuple[str, str | None]:
     """Run the Casey agent with the given text and optional session for context.
 
@@ -116,6 +126,7 @@ async def run_casey_agent(
         text: The user's message text.
         session_id: Optional session ID to resume a previous conversation.
         deps: Optional dependencies for tools that need Slack API access.
+        plan_streamer: Optional plan streamer for real-time tool visibility.
 
     Returns:
         A tuple of (response_text, new_session_id).
@@ -144,6 +155,10 @@ async def run_casey_agent(
                 for block in message.content:
                     if isinstance(block, TextBlock):
                         response_parts.append(block.text)
+                    elif plan_streamer and isinstance(block, ToolUseBlock):
+                        await plan_streamer.tool_started(block.name, block.id)
+                    elif plan_streamer and isinstance(block, ToolResultBlock):
+                        await plan_streamer.tool_completed(block.tool_use_id)
             if isinstance(message, ResultMessage):
                 new_session_id = message.session_id
 

@@ -7,6 +7,7 @@ from slack_bolt.context.set_status.async_set_status import AsyncSetStatus
 from slack_sdk.web.async_client import AsyncWebClient
 
 from agent import CaseyDeps, run_casey_agent
+from listeners.plan_streamer import AsyncPlanStreamer
 from thread_context import session_store
 from listeners.views.feedback_block import create_feedback_block
 
@@ -85,12 +86,12 @@ async def handle_message(
             thread_ts=thread_ts,
             message_ts=event["ts"],
         )
+        # Stream response with plan display mode for tool visibility
+        streamer = await say_stream(task_display_mode="plan")
+        plan = AsyncPlanStreamer(streamer)
         response_text, new_session_id = await run_casey_agent(
-            text, session_id=existing_session_id, deps=deps
+            text, session_id=existing_session_id, deps=deps, plan_streamer=plan
         )
-
-        # Stream response in thread with feedback buttons
-        streamer = await say_stream()
         await streamer.append(markdown_text=response_text)
         feedback_blocks = create_feedback_block()
         await streamer.stop(blocks=feedback_blocks)
