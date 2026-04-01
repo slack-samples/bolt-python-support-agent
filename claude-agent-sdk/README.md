@@ -48,7 +48,7 @@ slack login
 #### Initializing the project
 
 ```sh
-slack create my-casey-agent --template slack-samples/bolt-python-support-agent
+slack create my-casey-agent --template slack-samples/bolt-python-support-agent --subdir claude-agent-sdk
 cd my-casey-agent
 ```
 
