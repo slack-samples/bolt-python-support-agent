@@ -4,7 +4,7 @@ from slack_bolt import Ack, BoltContext
 from slack_sdk import WebClient
 
 
-def handle_feedback(
+def handle_feedback_button(
     ack: Ack, body: dict, client: WebClient, context: BoltContext, logger: Logger
 ):
     """Handle thumbs up/down feedback on Casey's responses."""

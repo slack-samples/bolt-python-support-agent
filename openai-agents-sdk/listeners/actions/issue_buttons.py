@@ -3,10 +3,10 @@ from logging import Logger
 from slack_bolt import Ack
 from slack_sdk import WebClient
 
-from listeners.views.modal_builder import build_issue_modal
+from listeners.views.issue_modal_builder import build_issue_modal
 
 
-def handle_category_button(ack: Ack, body: dict, client: WebClient, logger: Logger):
+def handle_issue_button(ack: Ack, body: dict, client: WebClient, logger: Logger):
     """Open the issue submission modal when a category button is clicked."""
     ack()
 

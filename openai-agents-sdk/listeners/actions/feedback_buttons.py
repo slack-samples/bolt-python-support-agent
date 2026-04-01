@@ -1,19 +1,14 @@
 from logging import Logger
 
-from slack_bolt import Ack
-from slack_bolt.context.async_context import AsyncBoltContext
-from slack_sdk.web.async_client import AsyncWebClient
+from slack_bolt import Ack, BoltContext
+from slack_sdk import WebClient
 
 
-async def handle_feedback(
-    ack: Ack,
-    body: dict,
-    client: AsyncWebClient,
-    context: AsyncBoltContext,
-    logger: Logger,
+def handle_feedback_button(
+    ack: Ack, body: dict, client: WebClient, context: BoltContext, logger: Logger
 ):
     """Handle thumbs up/down feedback on Casey's responses."""
-    await ack()
+    ack()
 
     try:
         channel_id = context.channel_id
@@ -22,14 +17,14 @@ async def handle_feedback(
         feedback_value = body["actions"][0]["value"]
 
         if feedback_value == "good-feedback":
-            await client.chat_postEphemeral(
+            client.chat_postEphemeral(
                 channel=channel_id,
                 user=user_id,
                 thread_ts=message_ts,
                 text="Glad that was helpful! :tada:",
             )
         else:
-            await client.chat_postEphemeral(
+            client.chat_postEphemeral(
                 channel=channel_id,
                 user=user_id,
                 thread_ts=message_ts,

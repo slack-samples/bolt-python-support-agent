@@ -7,7 +7,7 @@ from slack_sdk import WebClient
 
 from agent import CaseyDeps, casey_agent
 from thread_context import conversation_store
-from listeners.views.feedback_block import create_feedback_block
+from listeners.views.feedback_builder import build_feedback_blocks
 
 
 def handle_app_mentioned(
@@ -77,7 +77,7 @@ def handle_app_mentioned(
         # Stream response in thread with feedback buttons
         streamer = say_stream()
         streamer.append(markdown_text=result.final_output)
-        feedback_blocks = create_feedback_block()
+        feedback_blocks = build_feedback_blocks()
         streamer.stop(blocks=feedback_blocks)
 
         # Store conversation history

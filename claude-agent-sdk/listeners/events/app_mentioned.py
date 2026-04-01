@@ -9,7 +9,7 @@ from slack_sdk.web.async_client import AsyncWebClient
 
 from agent import CaseyDeps, run_casey_agent
 from thread_context import session_store
-from listeners.views.feedback_block import create_feedback_block
+from listeners.views.feedback_builder import build_feedback_blocks
 
 
 async def handle_app_mentioned(
@@ -75,7 +75,7 @@ async def handle_app_mentioned(
         # Stream response in thread with feedback buttons
         streamer = await say_stream()
         await streamer.append(markdown_text=response_text)
-        feedback_blocks = create_feedback_block()
+        feedback_blocks = build_feedback_blocks()
         await streamer.stop(blocks=feedback_blocks)
 
         # Store session ID for future context
