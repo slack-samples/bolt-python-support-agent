@@ -140,6 +140,82 @@ python3 app.py
 
 </details>
 
+<details><summary><strong>Using OAuth HTTP Server (with ngrok)</strong></summary>
+
+#### OAuth HTTP Server
+
+This mode uses an HTTP server instead of Socket Mode, which is required for OAuth-based distribution.
+
+1. Install [ngrok](https://ngrok.com/download) and start a tunnel:
+
+```sh
+ngrok http 3000
+```
+
+2. Copy the `https://*.ngrok-free.app` URL from the ngrok output.
+
+<details><summary><strong>Using Slack CLI</strong></summary>
+
+#### Slack CLI
+
+3. Swap the manifest files and update the request URL placeholder:
+
+```sh
+mv manifest.json manifest_socket_mode.json
+mv manifest_oauth.json manifest.json
+```
+
+Replace both instances of `https://PLACEHOLDER.ngrok-free.app` in `manifest.json` with your ngrok URL.
+
+4. Create a new local dev app:
+
+```sh
+slack install -E local
+```
+
+5. Copy the Signing Secret into your `.env`. Run the following command and copy the **Signing Secret** value from the output:
+
+```sh
+slack app settings
+```
+
+```sh
+SLACK_SIGNING_SECRET=YOUR_SIGNING_SECRET
+```
+
+6. Start the app:
+
+```sh
+slack run app_oauth.py
+```
+
+</details>
+
+<details><summary><strong>Using the Terminal</strong></summary>
+
+#### Terminal
+
+3. Create your Slack app at [api.slack.com/apps/new](https://api.slack.com/apps/new) using [`manifest_oauth.json`](./manifest_oauth.json). Before pasting the manifest, replace both instances of `https://PLACEHOLDER.ngrok-free.app/slack/events` with your ngrok URL followed by `/slack/events`.
+
+4. Install the app to your workspace and copy the **Signing Secret** (from _Basic Information_) and **Bot User OAuth Token** (from _OAuth & Permissions_) into your `.env`:
+
+```sh
+SLACK_SIGNING_SECRET=YOUR_SIGNING_SECRET
+SLACK_BOT_TOKEN=xoxb-YOUR_BOT_TOKEN
+```
+
+5. Start the app:
+
+```sh
+python3 app_oauth.py
+```
+
+</details>
+
+> **Note:** Each time ngrok restarts, it generates a new URL. You'll need to update the Request URL in your app's [Event Subscriptions](https://api.slack.com/apps) and [Interactivity](https://api.slack.com/apps) settings, or repeat the manifest setup steps above.
+
+</details>
+
 ### Using the App
 
 Once Casey is running, there are three ways to interact:
@@ -171,6 +247,14 @@ ruff format
 ### `app.py`
 
 `app.py` is the entry point for the application and is the file you'll run to start the server. This project uses `AsyncApp` from Bolt for Python, with all handlers running asynchronously.
+
+### `app_oauth.py`
+
+`app_oauth.py` is an alternative entry point that runs the app in HTTP mode instead of Socket Mode. This is intended for deployments that use OAuth for app distribution. See the HTTP Mode section under Development for setup instructions.
+
+### `manifest_oauth.json`
+
+`manifest_oauth.json` is the app manifest configured for HTTP mode (Socket Mode disabled, with request URLs for event subscriptions and interactivity). Use this when setting up the app for HTTP mode instead of `manifest.json`.
 
 ### `/listeners`
 
