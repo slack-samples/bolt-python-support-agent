@@ -27,7 +27,7 @@ CATEGORIES = [
 ]
 
 
-def build_app_home_view() -> dict:
+def build_app_home_view(is_connected: bool = False) -> dict:
     """Build the App Home Block Kit view with category buttons."""
     blocks = [
         {
@@ -75,7 +75,48 @@ def build_app_home_view() -> dict:
                 }
             ],
         },
+        {"type": "divider"},
     ]
+
+    if is_connected:
+        blocks.append(
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": (
+                        ":white_check_mark: *Your Slack account is connected.*\n"
+                        "Casey has access to search messages, read channels, and more."
+                    ),
+                },
+                "accessory": {
+                    "type": "button",
+                    "text": {"type": "plain_text", "text": "Disconnect"},
+                    "action_id": "disconnect_account",
+                    "style": "danger",
+                },
+            }
+        )
+    else:
+        blocks.append(
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": (
+                        ":electric_plug: *Connect your Slack account*\n"
+                        "Unlock full functionality including searching messages, "
+                        "reading channels, and more."
+                    ),
+                },
+                "accessory": {
+                    "type": "button",
+                    "text": {"type": "plain_text", "text": "Connect"},
+                    "action_id": "connect_account",
+                    "style": "primary",
+                },
+            }
+        )
 
     return {
         "type": "home",
