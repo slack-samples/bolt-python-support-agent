@@ -11,8 +11,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = [
+test = [
     "pytest",
+]
+dev = [
+    "bolt-python-support-agent-openai-agentkit[test]",
     "ruff==0.15.8",
 ]
 
