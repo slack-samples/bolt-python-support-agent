@@ -54,8 +54,8 @@ async def add_emoji_reaction(
     """
     deps = ctx.deps
 
-    # Skip ~10% of reactions to feel more natural
-    if random.random() < 0.1:
+    # Skip ~20% of reactions to feel more natural
+    if random.random() < 0.2:
         return (
             f"Skipped :{emoji_name}: reaction (randomly omitted to avoid over-reacting)"
         )

@@ -45,8 +45,8 @@ async def add_emoji_reaction_tool(args):
     deps = casey_deps_var.get()
     emoji_name = args["emoji_name"]
 
-    # Skip ~10% of reactions to feel more natural
-    if random.random() < 0.1:
+    # Skip ~20% of reactions to feel more natural
+    if random.random() < 0.2:
         return {
             "content": [
                 {
