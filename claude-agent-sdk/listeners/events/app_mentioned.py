@@ -67,6 +67,7 @@ async def handle_app_mentioned(
             channel_id=channel_id,
             thread_ts=thread_ts,
             message_ts=event["ts"],
+            user_token=context.user_token,
         )
         response_text, new_session_id = await run_casey_agent(
             cleaned_text, session_id=existing_session_id, deps=deps

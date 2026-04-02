@@ -1,6 +1,7 @@
 import os
 
 from pydantic_ai import Agent
+from pydantic_ai.mcp import MCPServerStreamableHTTP
 
 from agent.deps import CaseyDeps
 from agent.tools import (
@@ -99,6 +100,8 @@ def get_model() -> str:
     return _cached_model
 
 
+SLACK_MCP_URL = "https://mcp.slack.com/mcp"
+
 casey_agent = Agent(
     deps_type=CaseyDeps,
     system_prompt=CASEY_SYSTEM_PROMPT,
@@ -112,3 +115,23 @@ casey_agent = Agent(
         trigger_password_reset,
     ],
 )
+
+
+def run_casey(text, deps, message_history=None):
+    """Run the Casey agent, optionally connecting to the Slack MCP server."""
+    toolsets = []
+    if deps.user_token:
+        toolsets.append(
+            MCPServerStreamableHTTP(
+                SLACK_MCP_URL,
+                headers={"Authorization": f"Bearer {deps.user_token}"},
+            )
+        )
+
+    return casey_agent.run_sync(
+        text,
+        model=get_model(),
+        deps=deps,
+        message_history=message_history,
+        toolsets=toolsets,
+    )

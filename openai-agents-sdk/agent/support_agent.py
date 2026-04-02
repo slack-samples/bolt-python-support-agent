@@ -1,4 +1,5 @@
-from agents import Agent
+from agents import Agent, Runner
+from agents.mcp import MCPServerStreamableHttp
 
 from agent.deps import CaseyDeps
 from agent.tools import (
@@ -73,6 +74,8 @@ Call this once when the issue is fully resolved (password reset done, ticket cre
 - If unsure about a user's issue, ask clarifying questions before taking action
 """
 
+SLACK_MCP_URL = "https://mcp.slack.com/mcp"
+
 casey_agent = Agent[CaseyDeps](
     name="Casey",
     instructions=CASEY_SYSTEM_PROMPT,
@@ -87,3 +90,21 @@ casey_agent = Agent[CaseyDeps](
     ],
     model="gpt-4.1-mini",
 )
+
+
+def run_casey(input_items, deps):
+    """Run the Casey agent, optionally connecting to the Slack MCP server."""
+    agent = casey_agent
+    if deps.user_token:
+        agent = casey_agent.clone(
+            mcp_servers=[
+                MCPServerStreamableHttp(
+                    params={
+                        "url": SLACK_MCP_URL,
+                        "headers": {"Authorization": f"Bearer {deps.user_token}"},
+                    },
+                )
+            ]
+        )
+
+    return Runner.run_sync(agent, input=input_items, context=deps)

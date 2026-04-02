@@ -6,6 +6,7 @@ from claude_agent_sdk import (
     TextBlock,
     create_sdk_mcp_server,
 )
+from claude_agent_sdk.types import McpHttpServerConfig
 
 from agent.context import casey_deps_var
 from agent.deps import CaseyDeps
@@ -95,7 +96,9 @@ casey_tools_server = create_sdk_mcp_server(
     ],
 )
 
-ALLOWED_TOOLS = [
+SLACK_MCP_URL = "https://mcp.slack.com/mcp"
+
+CASEY_TOOLS = [
     "add_emoji_reaction",
     "check_system_status",
     "create_support_ticket",
@@ -124,10 +127,21 @@ async def run_casey_agent(
     if deps:
         casey_deps_var.set(deps)
 
+    mcp_servers: dict = {"casey-tools": casey_tools_server}
+    allowed_tools = list(CASEY_TOOLS)
+
+    if deps and deps.user_token:
+        mcp_servers["slack-mcp"] = McpHttpServerConfig(
+            type="http",
+            url=SLACK_MCP_URL,
+            headers={"Authorization": f"Bearer {deps.user_token}"},
+        )
+        allowed_tools.append("mcp__slack-mcp__*")
+
     options = ClaudeAgentOptions(
         system_prompt=CASEY_SYSTEM_PROMPT,
-        mcp_servers={"casey-tools": casey_tools_server},
-        allowed_tools=ALLOWED_TOOLS,
+        mcp_servers=mcp_servers,
+        allowed_tools=allowed_tools,
         permission_mode="bypassPermissions",
     )
 
