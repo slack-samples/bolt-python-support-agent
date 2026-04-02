@@ -27,8 +27,18 @@ CATEGORIES = [
 ]
 
 
-def build_app_home_view(is_connected: bool = False) -> dict:
-    """Build the App Home Block Kit view with category buttons."""
+def build_app_home_view(
+    authorize_url: str | None = None, is_connected: bool = False
+) -> dict:
+    """Build the App Home Block Kit view with category buttons.
+
+    Args:
+        authorize_url: OAuth authorize URL. When provided, the user has not
+            connected and will see a "Connect" URL button.
+        is_connected: When ``True``, the user is connected and will see a
+            "Disconnect" action button. When both params are default, the
+            OAuth section is hidden (app.py mode).
+    """
     blocks = [
         {
             "type": "header",
@@ -97,7 +107,7 @@ def build_app_home_view(is_connected: bool = False) -> dict:
                 },
             }
         )
-    else:
+    elif authorize_url:
         blocks.append(
             {
                 "type": "section",
@@ -112,6 +122,7 @@ def build_app_home_view(is_connected: bool = False) -> dict:
                 "accessory": {
                     "type": "button",
                     "text": {"type": "plain_text", "text": "Connect"},
+                    "url": authorize_url,
                     "action_id": "connect_account",
                     "style": "primary",
                 },

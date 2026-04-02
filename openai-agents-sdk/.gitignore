@@ -39,5 +39,8 @@ logs/
 .pytype/
 .idea/
 
+# oauth data
+data/
+
 # claude
 .claude/*.local.json
