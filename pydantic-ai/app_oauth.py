@@ -31,5 +31,4 @@ register_listeners(app)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 3000))
-    print(f"To install the app, navigate to http://localhost:{port}/slack/install")
     app.start(port=port)
