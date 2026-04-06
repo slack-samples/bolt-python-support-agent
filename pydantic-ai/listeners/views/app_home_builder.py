@@ -95,15 +95,9 @@ def build_app_home_view(
                 "text": {
                     "type": "mrkdwn",
                     "text": (
-                        ":white_check_mark: *Your Slack account is connected.*\n"
+                        "🟢 *Slack MCP Server is connected.*\n"
                         "Casey has access to search messages, read channels, and more."
                     ),
-                },
-                "accessory": {
-                    "type": "button",
-                    "text": {"type": "plain_text", "text": "Disconnect"},
-                    "action_id": "disconnect_account",
-                    "style": "danger",
                 },
             }
         )
@@ -113,18 +107,7 @@ def build_app_home_view(
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": (
-                        ":electric_plug: *Connect your Slack account*\n"
-                        "Unlock full functionality including searching messages, "
-                        "reading channels, and more."
-                    ),
-                },
-                "accessory": {
-                    "type": "button",
-                    "text": {"type": "plain_text", "text": "Connect"},
-                    "url": authorize_url,
-                    "action_id": "connect_account",
-                    "style": "primary",
+                    "text": f"🔴 *Slack MCP Server is disconnected.* <{authorize_url}|Connect now.>",
                 },
             }
         )
