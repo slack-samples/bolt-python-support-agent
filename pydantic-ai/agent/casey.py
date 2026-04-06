@@ -1,7 +1,7 @@
 import logging
 import os
 
-from pydantic_ai import Agent, RunContext
+from pydantic_ai import Agent
 from pydantic_ai.mcp import MCPServerStreamableHTTP
 
 from agent.deps import CaseyDeps
@@ -70,6 +70,21 @@ Vary your picks across a thread; don't repeat the same emoji.
 Call this once when the issue is fully resolved (password reset done, ticket created, problem fixed).
 - Do not use `eyes` — it is added automatically
 
+## SLACK MCP SERVER
+You may have access to the Slack MCP Server, which gives you powerful Slack tools beyond \
+your built-in IT helpdesk tools. Use them whenever they would help the user.
+
+Available capabilities:
+- **Search**: Search messages and files across public channels, search for channels by name
+- **Read**: Read channel message history, read thread replies, read canvas documents
+- **Write**: Send messages, create draft messages, schedule messages for later
+- **Canvases**: Create, read, and update Slack canvas documents
+
+Use these tools proactively when they can help resolve an IT issue — for example, \
+searching for related reports from other users, checking a channel for outage updates, \
+or creating a canvas to document a solution. Also use them when the user explicitly \
+asks you to perform a Slack action like sending a message or creating a canvas.
+
 ## BOUNDARIES
 - You are an IT helpdesk agent only — politely redirect non-IT questions
 - Do not make up system statuses or ticket numbers — always use the provided tools
@@ -118,30 +133,6 @@ casey_agent = Agent(
         trigger_password_reset,
     ],
 )
-
-
-@casey_agent.system_prompt
-def slack_mcp_prompt(ctx: RunContext[CaseyDeps]) -> str | None:
-    """Append Slack MCP Server instructions when the user token is available."""
-    if not ctx.deps.user_token:
-        return None
-    return """\
-
-## SLACK MCP SERVER
-You have access to the Slack MCP Server, which gives you powerful Slack tools beyond \
-your built-in IT helpdesk tools. Use them whenever they would help the user.
-
-Available capabilities:
-- **Search**: Search messages and files across public channels, search for channels by name
-- **Read**: Read channel message history, read thread replies, read canvas documents
-- **Write**: Send messages, create draft messages, schedule messages for later
-- **Canvases**: Create, read, and update Slack canvas documents
-
-Use these tools proactively when they can help resolve an IT issue — for example, \
-searching for related reports from other users, checking a channel for outage updates, \
-or creating a canvas to document a solution. Also use them when the user explicitly \
-asks you to perform a Slack action like sending a message or creating a canvas.
-"""
 
 
 def run_casey(text, deps, message_history=None):
