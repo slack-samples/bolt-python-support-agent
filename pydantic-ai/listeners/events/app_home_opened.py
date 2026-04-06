@@ -15,12 +15,18 @@ def handle_app_home_opened(client: WebClient, context: BoltContext, logger: Logg
         is_connected = False
 
         if os.environ.get("SLACK_CLIENT_ID"):
-            from oauth import install_uri
+            from oauth import authorize_url_generator, installation_store, state_store
 
-            if context.authorize_result.user_token:
+            installation = installation_store.find_installation(
+                enterprise_id=context.enterprise_id or "",
+                team_id=context.team_id or "",
+                user_id=user_id,
+            )
+            if installation and installation.user_token:
                 is_connected = True
             else:
-                authorize_url = install_uri
+                state = state_store.issue()
+                authorize_url = authorize_url_generator.generate(state)
 
         view = build_app_home_view(
             authorize_url=authorize_url, is_connected=is_connected

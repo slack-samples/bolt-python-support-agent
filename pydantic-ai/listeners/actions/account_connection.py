@@ -21,16 +21,17 @@ def handle_disconnect_account(
     """Handle the Disconnect button click on App Home."""
     ack()
     try:
-        from oauth import install_uri, oauth_settings
+        from oauth import authorize_url_generator, installation_store, state_store
 
         user_id = context.user_id
-        oauth_settings.installation_store.delete_installation(
-                enterprise_id=context.enterprise_id,
-                team_id=context.team_id,
-                user_id=user_id,
-            )
-        oauth_settings.installation_store.delete_bot
-        view = build_app_home_view(authorize_url=install_uri)
+        installation_store.delete_installation(
+            enterprise_id=context.enterprise_id or "",
+            team_id=context.team_id or "",
+            user_id=user_id,
+        )
+        state = state_store.issue()
+        authorize_url = authorize_url_generator.generate(state)
+        view = build_app_home_view(authorize_url=authorize_url)
         client.views_publish(user_id=user_id, view=view)
     except Exception as e:
         logger.exception(f"Failed to handle disconnect: {e}")
