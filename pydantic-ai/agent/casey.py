@@ -1,6 +1,7 @@
+import logging
 import os
 
-from pydantic_ai import Agent
+from pydantic_ai import Agent, RunContext
 from pydantic_ai.mcp import MCPServerStreamableHTTP
 
 from agent.deps import CaseyDeps
@@ -76,6 +77,8 @@ Call this once when the issue is fully resolved (password reset done, ticket cre
 - If unsure about a user's issue, ask clarifying questions before taking action
 """
 
+logger = logging.getLogger(__name__)
+
 _cached_model: str | None = None
 
 
@@ -117,16 +120,43 @@ casey_agent = Agent(
 )
 
 
+@casey_agent.system_prompt
+def slack_mcp_prompt(ctx: RunContext[CaseyDeps]) -> str | None:
+    """Append Slack MCP Server instructions when the user token is available."""
+    if not ctx.deps.user_token:
+        return None
+    return """\
+
+## SLACK MCP SERVER
+You have access to the Slack MCP Server, which gives you powerful Slack tools beyond \
+your built-in IT helpdesk tools. Use them whenever they would help the user.
+
+Available capabilities:
+- **Search**: Search messages and files across public channels, search for channels by name
+- **Read**: Read channel message history, read thread replies, read canvas documents
+- **Write**: Send messages, create draft messages, schedule messages for later
+- **Canvases**: Create, read, and update Slack canvas documents
+
+Use these tools proactively when they can help resolve an IT issue — for example, \
+searching for related reports from other users, checking a channel for outage updates, \
+or creating a canvas to document a solution. Also use them when the user explicitly \
+asks you to perform a Slack action like sending a message or creating a canvas.
+"""
+
+
 def run_casey(text, deps, message_history=None):
     """Run the Casey agent, optionally connecting to the Slack MCP server."""
     toolsets = []
     if deps.user_token:
+        logger.info("Slack MCP Server enabled (user_token present)")
         toolsets.append(
             MCPServerStreamableHTTP(
                 SLACK_MCP_URL,
                 headers={"Authorization": f"Bearer {deps.user_token}"},
             )
         )
+    else:
+        logger.info("Slack MCP Server disabled (no user_token)")
 
     return casey_agent.run_sync(
         text,

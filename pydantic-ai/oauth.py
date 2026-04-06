@@ -6,7 +6,6 @@ from pathlib import Path
 from slack_bolt.authorization.authorize_result import AuthorizeResult
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_sdk import WebClient
-from slack_sdk.oauth import AuthorizeUrlGenerator
 from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
 
@@ -28,19 +27,11 @@ USER_SCOPES = [
 
 installation_store = FileInstallationStore(
     base_dir="./data/installations",
-    historical_data_enabled=False,
 )
 
 state_store = FileOAuthStateStore(
     expiration_seconds=600,
     base_dir="./data/states",
-)
-
-authorize_url_generator = AuthorizeUrlGenerator(
-    client_id=os.environ.get("SLACK_CLIENT_ID", ""),
-    redirect_uri=os.environ.get("SLACK_REDIRECT_URI", ""),
-    scopes=BOT_SCOPES,
-    user_scopes=USER_SCOPES,
 )
 
 oauth_settings = OAuthSettings(

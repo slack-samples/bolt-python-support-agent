@@ -28,16 +28,15 @@ CATEGORIES = [
 
 
 def build_app_home_view(
-    authorize_url: str | None = None, is_connected: bool = False
+    install_url: str | None = None, is_connected: bool = False
 ) -> dict:
     """Build the App Home Block Kit view with category buttons.
 
     Args:
-        authorize_url: OAuth authorize URL. When provided, the user has not
-            connected and will see a "Connect" URL button.
-        is_connected: When ``True``, the user is connected and will see a
-            "Disconnect" action button. When both params are default, the
-            OAuth section is hidden (app.py mode).
+        install_url: OAuth install URL. When provided, the user has not
+            connected and will see a link to install.
+        is_connected: When ``True``, the user is connected and the MCP
+            status section shows as connected.
     """
     blocks = [
         {
@@ -109,13 +108,13 @@ def build_app_home_view(
                 ],
             }
         )
-    elif authorize_url:
+    elif install_url:
         blocks.append(
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"🔴 *Slack MCP Server is disconnected.* <{authorize_url}|Connect the Slack MCP Server.>",
+                    "text": f"🔴 *Slack MCP Server is disconnected.* <{install_url}|Connect the Slack MCP Server.>",
                 },
             }
         )

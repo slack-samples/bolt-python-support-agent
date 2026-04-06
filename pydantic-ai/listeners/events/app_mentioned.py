@@ -7,6 +7,7 @@ from slack_sdk import WebClient
 from agent import CaseyDeps, run_casey
 from thread_context import conversation_store
 from listeners.views.feedback_builder import build_feedback_blocks
+from oauth import installation_store
 
 
 def handle_app_mentioned(
@@ -58,6 +59,17 @@ def handle_app_mentioned(
         # Get conversation history
         history = conversation_store.get_history(channel_id, thread_ts)
 
+        # Look up the user token directly from the installation store rather
+        # than context.user_token. Bolt's InstallationStoreAuthorize may fail
+        # to resolve the user token when installer-latest is missing or the
+        # requesting user differs from the original installer.
+        installation = installation_store.find_installation(
+            enterprise_id=context.enterprise_id,
+            team_id=context.team_id,
+            user_id=user_id,
+        )
+        user_token = installation.user_token if installation else None
+
         # Run the agent
         deps = CaseyDeps(
             client=client,
@@ -65,7 +77,7 @@ def handle_app_mentioned(
             channel_id=channel_id,
             thread_ts=thread_ts,
             message_ts=event["ts"],
-            user_token=context.user_token,
+            user_token=user_token,
         )
         result = run_casey(cleaned_text, deps, message_history=history)
 

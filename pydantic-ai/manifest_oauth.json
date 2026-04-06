@@ -30,7 +30,17 @@
         "groups:read",
         "im:history",
         "mpim:history",
-        "users:read"
+        "users:read",
+        "search:read.public",
+        "search:read.private",
+        "search:read.mpim",
+        "search:read.im",
+        "search:read.files",
+        "search:read.users",
+        "chat:write",
+        "canvases:read",
+        "canvases:write",
+        "users:read.email"
       ],
       "bot": [
         "app_mentions:read",
