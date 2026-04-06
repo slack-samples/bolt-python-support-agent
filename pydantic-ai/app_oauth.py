@@ -3,12 +3,11 @@ import os
 
 from dotenv import load_dotenv
 from slack_bolt import App
-from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_sdk import WebClient
 
 from agent import get_model
 from listeners import register_listeners
-from oauth import BOT_SCOPES, USER_SCOPES, installation_store, state_store
+from oauth import oauth_settings
 
 load_dotenv(dotenv_path=".env", override=False)
 get_model()  # Fail fast if no AI provider key is configured
@@ -25,14 +24,7 @@ app = App(
     # Allow bot-posted messages (e.g. issue modal submissions with metadata)
     # to reach the message handler instead of being silently dropped
     ignoring_self_events_enabled=False,
-    oauth_settings=OAuthSettings(
-        client_id=os.environ.get("SLACK_CLIENT_ID"),
-        client_secret=os.environ.get("SLACK_CLIENT_SECRET"),
-        scopes=BOT_SCOPES,
-        user_scopes=USER_SCOPES,
-        installation_store=installation_store,
-        state_store=state_store,
-    ),
+    oauth_settings=oauth_settings,
 )
 
 register_listeners(app)

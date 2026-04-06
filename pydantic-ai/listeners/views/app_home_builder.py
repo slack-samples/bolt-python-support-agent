@@ -94,11 +94,19 @@ def build_app_home_view(
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": (
-                        "🟢 *Slack MCP Server is connected.*\n"
-                        "Casey has access to search messages, read channels, and more."
-                    ),
+                    "text": "🟢 *Slack MCP Server is connected.*",
                 },
+            }
+        )
+        blocks.append(
+            {
+                "type": "context",
+                "elements": [
+                    {
+                        "type": "mrkdwn",
+                        "text": "Casey has access to search messages, read channels, and more.",
+                    }
+                ],
             }
         )
     elif authorize_url:
@@ -107,8 +115,19 @@ def build_app_home_view(
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"🔴 *Slack MCP Server is disconnected.* <{authorize_url}|Connect now.>",
+                    "text": f"🔴 *Slack MCP Server is disconnected.* <{authorize_url}|Connect the Slack MCP Server.>",
                 },
+            }
+        )
+        blocks.append(
+            {
+                "type": "context",
+                "elements": [
+                    {
+                        "type": "mrkdwn",
+                        "text": "The Slack MCP Server enables Casey to search messages, read channels, and more.",
+                    }
+                ],
             }
         )
 
