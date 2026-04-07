@@ -16,14 +16,7 @@ def handle_app_home_opened(client: WebClient, context: BoltContext, logger: Logg
         is_connected = False
 
         if os.environ.get("SLACK_CLIENT_ID"):
-            from oauth import installation_store
-
-            installation = installation_store.find_installation(
-                enterprise_id=context.enterprise_id or "",
-                team_id=context.team_id or "",
-                user_id=user_id,
-            )
-            if installation and installation.user_token:
+            if context.user_token:
                 is_connected = True
             else:
                 redirect_uri = os.environ.get("SLACK_REDIRECT_URI", "")
