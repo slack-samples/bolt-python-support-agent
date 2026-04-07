@@ -7,8 +7,11 @@ from claude_agent_sdk import tool
         "Trigger a password reset for a specified user account. "
         "Use this tool when a user requests a password reset for their own account "
         "or reports being locked out. The reset link will be sent to their registered "
-        "email address. Before calling this tool, look up the user's email address "
-        "using available Slack tools if possible, rather than asking the user for it."
+        "email address. "
+        "IMPORTANT: You need the user's email address for target_user. "
+        "First, try to look up the user's Slack profile to get their email address. "
+        "If the lookup fails or does not return an email, ask the user for their email address. "
+        "Never guess or assume — you must either look it up or ask for it."
     ),
     input_schema={"target_user": str},
 )
