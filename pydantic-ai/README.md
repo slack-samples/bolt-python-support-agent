@@ -192,16 +192,17 @@ slack install -E local
    - Navigate to **Agents & AI Apps** in the left-side navigation
    - Toggle **Model Context Protocol** on
 
-6. Copy the following values into your `.env`. Run `slack app settings` and copy the **Signing Secret**, **Client ID**, and **Client Secret**:
+6. Update your `.env` OAuth environment variables:
+   - Run `slack app settings` to open App Settings
+   - Copy **Client ID**, **Client Secret**, and **Signing Secret**
+   - Update the **Slack Redirect URI** with your ngrok URL
 
 ```sh
-SLACK_SIGNING_SECRET=YOUR_SIGNING_SECRET
 SLACK_CLIENT_ID=YOUR_CLIENT_ID
 SLACK_CLIENT_SECRET=YOUR_CLIENT_SECRET
 SLACK_REDIRECT_URI=https://YOUR_NGROK_SUBDOMAIN.ngrok-free.app/slack/oauth_redirect
+SLACK_SIGNING_SECRET=YOUR_SIGNING_SECRET
 ```
-
-Replace `YOUR_NGROK_SUBDOMAIN` in `SLACK_REDIRECT_URI` with your ngrok subdomain.
 
 7. Start the app:
 
