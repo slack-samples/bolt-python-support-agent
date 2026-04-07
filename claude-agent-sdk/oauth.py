@@ -13,17 +13,7 @@ logger = logging.getLogger(__name__)
 
 _manifest = json.loads(Path("manifest.json").read_text())
 BOT_SCOPES = _manifest["oauth_config"]["scopes"]["bot"]
-
-USER_SCOPES = [
-    "search:read",
-    "channels:history",
-    "channels:read",
-    "groups:history",
-    "groups:read",
-    "im:history",
-    "mpim:history",
-    "users:read",
-]
+USER_SCOPES = _manifest["oauth_config"]["scopes"]["user"]
 
 installation_store = FileInstallationStore(
     base_dir="./data/installations",
