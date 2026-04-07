@@ -6,3 +6,7 @@
 
 # Git
 .worktrees/
+
+# Slack App Templates
+*/.slack/apps.json
+*/.slack/apps.dev.json
