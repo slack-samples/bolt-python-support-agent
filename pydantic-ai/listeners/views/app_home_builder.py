@@ -74,7 +74,6 @@ def build_app_home_view(
                 for cat in CATEGORIES
             ],
         },
-        {"type": "divider"},
         {
             "type": "context",
             "elements": [
