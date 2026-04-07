@@ -158,14 +158,9 @@ ngrok http 3000
 
 #### Slack CLI
 
-3. Swap the manifest files and update the request URL placeholders:
-
-```sh
-mv manifest.json manifest_socket_mode.json
-mv manifest_oauth.json manifest.json
-```
-
-Replace all instances of `https://YOUR_NGROK_SUBDOMAIN.ngrok-free.app` in `manifest.json` with your ngrok URL.
+3. Update `manifest.json` for HTTP mode:
+   - Set `socket_mode_enabled` to `false`
+   - Replace `ngrok-free.app` with your ngrok domain (e.g. `YOUR_NGROK_SUBDOMAIN.ngrok-free.app`)
 
 4. Create a new local dev app:
 
@@ -181,7 +176,7 @@ slack install -E local
 6. Update your `.env` OAuth environment variables:
    - Run `slack app settings` to open App Settings
    - Copy **Client ID**, **Client Secret**, and **Signing Secret**
-   - Update the **Slack Redirect URI** with your ngrok URL
+   - Update `SLACK_REDIRECT_URI` in `.env` with your ngrok domain
 
 ```sh
 SLACK_CLIENT_ID=YOUR_CLIENT_ID
@@ -204,7 +199,7 @@ slack run app_oauth.py
 
 #### Terminal
 
-3. Create your Slack app at [api.slack.com/apps/new](https://api.slack.com/apps/new) using [`manifest_oauth.json`](./manifest_oauth.json). Before pasting the manifest, replace all instances of `https://YOUR_NGROK_SUBDOMAIN.ngrok-free.app` with your ngrok URL.
+3. Create your Slack app at [api.slack.com/apps/new](https://api.slack.com/apps/new) using [`manifest.json`](./manifest.json). Before pasting the manifest, set `socket_mode_enabled` to `false` and replace `ngrok-free.app` with your ngrok domain.
 
 4. Install the app to your workspace and copy the following values into your `.env`:
    - **Signing Secret** — from _Basic Information_
@@ -219,7 +214,7 @@ SLACK_CLIENT_SECRET=YOUR_CLIENT_SECRET
 SLACK_REDIRECT_URI=https://YOUR_NGROK_SUBDOMAIN.ngrok-free.app/slack/oauth_redirect
 ```
 
-Replace `YOUR_NGROK_SUBDOMAIN` in `SLACK_REDIRECT_URI` with your ngrok subdomain.
+Replace `your-subdomain` in `SLACK_REDIRECT_URI` with your ngrok subdomain.
 
 5. Enable MCP for your app:
    - Open your app at [api.slack.com/apps](https://api.slack.com/apps)
@@ -236,7 +231,7 @@ python3 app_oauth.py
 
 </details>
 
-> **Note:** Each time ngrok restarts, it generates a new URL. You'll need to update the Request URL in your app's [Event Subscriptions](https://api.slack.com/apps) and [Interactivity](https://api.slack.com/apps) settings, or repeat the manifest setup steps above.
+> **Note:** Each time ngrok restarts, it generates a new URL. You'll need to update the ngrok domain in `manifest.json`, `SLACK_REDIRECT_URI` in your `.env`, and re-install the app.
 
 </details>
 
@@ -275,10 +270,6 @@ ruff format
 ### `app_oauth.py`
 
 `app_oauth.py` is an alternative entry point that runs the app in HTTP mode instead of Socket Mode. This is intended for deployments that use OAuth for app distribution. See the HTTP Mode section under Development for setup instructions.
-
-### `manifest_oauth.json`
-
-`manifest_oauth.json` is the app manifest configured for HTTP mode (Socket Mode disabled, with request URLs for event subscriptions and interactivity). Use this when setting up the app for HTTP mode instead of `manifest.json`.
 
 ### `/listeners`
 
