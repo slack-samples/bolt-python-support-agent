@@ -179,7 +179,7 @@ mv manifest.json manifest_socket_mode.json
 mv manifest_oauth.json manifest.json
 ```
 
-Replace all instances of `https://PLACEHOLDER.ngrok-free.app` in `manifest.json` with your ngrok URL.
+Replace all instances of `https://YOUR_NGROK_SUBDOMAIN.ngrok-free.app` in `manifest.json` with your ngrok URL.
 
 4. Create a new local dev app:
 
@@ -198,10 +198,10 @@ slack install -E local
 SLACK_SIGNING_SECRET=YOUR_SIGNING_SECRET
 SLACK_CLIENT_ID=YOUR_CLIENT_ID
 SLACK_CLIENT_SECRET=YOUR_CLIENT_SECRET
-SLACK_REDIRECT_URI=https://YOUR_NGROK_URL.ngrok-free.app/slack/oauth_redirect
+SLACK_REDIRECT_URI=https://YOUR_NGROK_SUBDOMAIN.ngrok-free.app/slack/oauth_redirect
 ```
 
-Replace `YOUR_NGROK_URL` in `SLACK_REDIRECT_URI` with your ngrok subdomain.
+Replace `YOUR_NGROK_SUBDOMAIN` in `SLACK_REDIRECT_URI` with your ngrok subdomain.
 
 7. Start the app:
 
@@ -217,7 +217,7 @@ slack run app_oauth.py
 
 #### Terminal
 
-3. Create your Slack app at [api.slack.com/apps/new](https://api.slack.com/apps/new) using [`manifest_oauth.json`](./manifest_oauth.json). Before pasting the manifest, replace all instances of `https://PLACEHOLDER.ngrok-free.app` with your ngrok URL.
+3. Create your Slack app at [api.slack.com/apps/new](https://api.slack.com/apps/new) using [`manifest_oauth.json`](./manifest_oauth.json). Before pasting the manifest, replace all instances of `https://YOUR_NGROK_SUBDOMAIN.ngrok-free.app` with your ngrok URL.
 
 4. Install the app to your workspace and copy the following values into your `.env`:
    - **Signing Secret** — from _Basic Information_
@@ -229,10 +229,10 @@ SLACK_SIGNING_SECRET=YOUR_SIGNING_SECRET
 SLACK_BOT_TOKEN=xoxb-YOUR_BOT_TOKEN
 SLACK_CLIENT_ID=YOUR_CLIENT_ID
 SLACK_CLIENT_SECRET=YOUR_CLIENT_SECRET
-SLACK_REDIRECT_URI=https://YOUR_NGROK_URL.ngrok-free.app/slack/oauth_redirect
+SLACK_REDIRECT_URI=https://YOUR_NGROK_SUBDOMAIN.ngrok-free.app/slack/oauth_redirect
 ```
 
-Replace `YOUR_NGROK_URL` in `SLACK_REDIRECT_URI` with your ngrok subdomain.
+Replace `YOUR_NGROK_SUBDOMAIN` in `SLACK_REDIRECT_URI` with your ngrok subdomain.
 
 5. Enable MCP for your app:
    - Open your app at [api.slack.com/apps](https://api.slack.com/apps)
