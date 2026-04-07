@@ -14,7 +14,7 @@ async def mark_resolved(
     Call this once when the issue is fully resolved — e.g. password reset
     complete, ticket created, problem fixed.
     """
-    deps = wrapper.context.deps
+    deps = wrapper.context
 
     try:
         deps.client.reactions_add(

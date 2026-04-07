@@ -1,10 +1,9 @@
 from logging import Logger
 
-from agents import Runner
 from slack_bolt import BoltContext, Say, SayStream, SetStatus
 from slack_sdk import WebClient
 
-from agent import CaseyDeps, casey_agent
+from agent import CaseyDeps, run_casey
 from thread_context import conversation_store
 from listeners.views.feedback_builder import build_feedback_blocks
 
@@ -95,8 +94,9 @@ def handle_message(
             channel_id=channel_id,
             thread_ts=thread_ts,
             message_ts=event["ts"],
+            user_token=context.user_token,
         )
-        result = Runner.run_sync(casey_agent, input=input_items, context=deps)
+        result = run_casey(input_items, deps)
 
         # Stream response in thread with feedback buttons
         streamer = say_stream()
