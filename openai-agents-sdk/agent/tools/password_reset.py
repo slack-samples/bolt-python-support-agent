@@ -22,7 +22,7 @@ async def trigger_password_reset(
     """
     return (
         f"Password reset initiated for **{target_user}**.\n\n"
-        f"A reset link has been sent to **{target_user}@acme.com**. "
+        f"A reset link has been emailed to **{target_user}**. "
         f"The link will expire in 30 minutes.\n\n"
         f"_If the user doesn't receive the email within 5 minutes, "
         f"ask them to check their spam folder or verify their registered email address._"
