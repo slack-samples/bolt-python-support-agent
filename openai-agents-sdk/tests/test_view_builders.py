@@ -26,7 +26,7 @@ def test_build_feedback_blocks():
 
 
 def test_build_app_home_view_default():
-    """Default args (app.py mode) — no OAuth section."""
+    """Default args (app.py mode) — no MCP status section."""
     view = build_app_home_view()
 
     assert view["type"] == "home"
@@ -35,36 +35,31 @@ def test_build_app_home_view_default():
     actions_block = next(b for b in view["blocks"] if b["type"] == "actions")
     assert len(actions_block["elements"]) == len(CATEGORIES)
 
-    # No connect or disconnect buttons
-    section_blocks = [b for b in view["blocks"] if b["type"] == "section"]
-    accessory_actions = [
-        b["accessory"]["action_id"] for b in section_blocks if "accessory" in b
+    # No MCP status section
+    section_texts = [
+        b["text"]["text"] for b in view["blocks"] if b["type"] == "section"
     ]
-    assert "connect_account" not in accessory_actions
-    assert "disconnect_account" not in accessory_actions
+    assert not any("Slack MCP Server" in t for t in section_texts)
 
 
 def test_build_app_home_view_connect():
-    """authorize_url provided — shows Connect URL button."""
-    view = build_app_home_view(authorize_url="https://example.com/oauth")
+    """install_url provided — shows disconnected status with install link."""
+    view = build_app_home_view(install_url="https://example.com/slack/install")
 
-    section_blocks = [b for b in view["blocks"] if b["type"] == "section"]
-    connect_section = next(
-        b
-        for b in section_blocks
-        if b.get("accessory", {}).get("action_id") == "connect_account"
-    )
-    assert connect_section["accessory"]["url"] == "https://example.com/oauth"
+    section_texts = [
+        b["text"]["text"] for b in view["blocks"] if b["type"] == "section"
+    ]
+    mcp_section = next(t for t in section_texts if "Slack MCP Server" in t)
+    assert "disconnected" in mcp_section
+    assert "https://example.com/slack/install" in mcp_section
 
 
-def test_build_app_home_view_disconnect():
-    """is_connected=True — shows Disconnect button."""
+def test_build_app_home_view_connected():
+    """is_connected=True — shows connected status."""
     view = build_app_home_view(is_connected=True)
 
-    section_blocks = [b for b in view["blocks"] if b["type"] == "section"]
-    disconnect_section = next(
-        b
-        for b in section_blocks
-        if b.get("accessory", {}).get("action_id") == "disconnect_account"
-    )
-    assert disconnect_section["accessory"]["style"] == "danger"
+    section_texts = [
+        b["text"]["text"] for b in view["blocks"] if b["type"] == "section"
+    ]
+    mcp_section = next(t for t in section_texts if "Slack MCP Server" in t)
+    assert "connected" in mcp_section

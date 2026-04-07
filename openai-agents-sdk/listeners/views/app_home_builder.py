@@ -28,16 +28,15 @@ CATEGORIES = [
 
 
 def build_app_home_view(
-    authorize_url: str | None = None, is_connected: bool = False
+    install_url: str | None = None, is_connected: bool = False
 ) -> dict:
     """Build the App Home Block Kit view with category buttons.
 
     Args:
-        authorize_url: OAuth authorize URL. When provided, the user has not
-            connected and will see a "Connect" URL button.
-        is_connected: When ``True``, the user is connected and will see a
-            "Disconnect" action button. When both params are default, the
-            OAuth section is hidden (app.py mode).
+        install_url: OAuth install URL. When provided, the user has not
+            connected and will see a link to install.
+        is_connected: When ``True``, the user is connected and the MCP
+            status section shows as connected.
     """
     blocks = [
         {
@@ -75,7 +74,6 @@ def build_app_home_view(
                 for cat in CATEGORIES
             ],
         },
-        {"type": "divider"},
         {
             "type": "context",
             "elements": [
@@ -94,38 +92,40 @@ def build_app_home_view(
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": (
-                        ":white_check_mark: *Your Slack account is connected.*\n"
-                        "Casey has access to search messages, read channels, and more."
-                    ),
-                },
-                "accessory": {
-                    "type": "button",
-                    "text": {"type": "plain_text", "text": "Disconnect"},
-                    "action_id": "disconnect_account",
-                    "style": "danger",
+                    "text": "\U0001f7e2 *Slack MCP Server is connected.*",
                 },
             }
         )
-    elif authorize_url:
+        blocks.append(
+            {
+                "type": "context",
+                "elements": [
+                    {
+                        "type": "mrkdwn",
+                        "text": "Casey has access to search messages, read channels, and more.",
+                    }
+                ],
+            }
+        )
+    elif install_url:
         blocks.append(
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": (
-                        ":electric_plug: *Connect your Slack account*\n"
-                        "Unlock full functionality including searching messages, "
-                        "reading channels, and more."
-                    ),
+                    "text": f"\U0001f534 *Slack MCP Server is disconnected.* <{install_url}|Connect the Slack MCP Server.>",
                 },
-                "accessory": {
-                    "type": "button",
-                    "text": {"type": "plain_text", "text": "Connect"},
-                    "url": authorize_url,
-                    "action_id": "connect_account",
-                    "style": "primary",
-                },
+            }
+        )
+        blocks.append(
+            {
+                "type": "context",
+                "elements": [
+                    {
+                        "type": "mrkdwn",
+                        "text": "The Slack MCP Server enables Casey to search messages, read channels, and more.",
+                    }
+                ],
             }
         )
 

@@ -1,3 +1,6 @@
+import asyncio
+import logging
+
 from agents import Agent, Runner
 from agents.mcp import MCPServerStreamableHttp
 
@@ -49,6 +52,8 @@ BAD: "OMG this is so frustrating!!!" (too emotional)
 2. Search the knowledge base for relevant articles
 3. If the KB has a solution, walk the user through it step by step
 4. If the issue requires action (password reset, ticket creation), use the appropriate tool
+   - For password resets: look up the user's email address using Slack MCP tools before \
+triggering the reset — don't ask the user for information you can look up yourself
 5. After taking action, confirm what was done and what the user should expect next
 6. If you cannot resolve the issue, create a support ticket and let the user know
 
@@ -67,12 +72,29 @@ Vary your picks across a thread; don't repeat the same emoji.
 Call this once when the issue is fully resolved (password reset done, ticket created, problem fixed).
 - Do not use `eyes` — it is added automatically
 
+## SLACK MCP SERVER
+You may have access to the Slack MCP Server, which gives you powerful Slack tools beyond \
+your built-in IT helpdesk tools. Use them whenever they would help the user.
+
+Available capabilities:
+- **Search**: Search messages and files across public channels, search for channels by name
+- **Read**: Read channel message history, read thread replies, read canvas documents
+- **Write**: Send messages, create draft messages, schedule messages for later
+- **Canvases**: Create, read, and update Slack canvas documents
+
+Use these tools proactively when they can help resolve an IT issue — for example, \
+searching for related reports from other users, checking a channel for outage updates, \
+or creating a canvas to document a solution. Also use them when the user explicitly \
+asks you to perform a Slack action like sending a message or creating a canvas.
+
 ## BOUNDARIES
 - You are an IT helpdesk agent only — politely redirect non-IT questions
 - Do not make up system statuses or ticket numbers — always use the provided tools
 - Do not promise specific resolution times unless the tool response includes them
 - If unsure about a user's issue, ask clarifying questions before taking action
 """
+
+logger = logging.getLogger(__name__)
 
 SLACK_MCP_URL = "https://mcp.slack.com/mcp"
 
@@ -94,17 +116,22 @@ casey_agent = Agent[CaseyDeps](
 
 def run_casey(input_items, deps):
     """Run the Casey agent, optionally connecting to the Slack MCP server."""
-    agent = casey_agent
     if deps.user_token:
-        agent = casey_agent.clone(
-            mcp_servers=[
-                MCPServerStreamableHttp(
-                    params={
-                        "url": SLACK_MCP_URL,
-                        "headers": {"Authorization": f"Bearer {deps.user_token}"},
-                    },
-                )
-            ]
-        )
+        logger.info("Slack MCP Server enabled (user_token present)")
+        return asyncio.run(_run_with_mcp(input_items, deps))
 
-    return Runner.run_sync(agent, input=input_items, context=deps)
+    logger.info("Slack MCP Server disabled (no user_token)")
+    return Runner.run_sync(casey_agent, input=input_items, context=deps)
+
+
+async def _run_with_mcp(input_items, deps):
+    """Run the agent with the Slack MCP Server connected."""
+    mcp_server = MCPServerStreamableHttp(
+        params={
+            "url": SLACK_MCP_URL,
+            "headers": {"Authorization": f"Bearer {deps.user_token}"},
+        },
+    )
+    async with mcp_server:
+        agent = casey_agent.clone(mcp_servers=[mcp_server])
+        return await Runner.run(agent, input=input_items, context=deps)

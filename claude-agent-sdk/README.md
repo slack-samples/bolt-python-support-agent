@@ -165,7 +165,7 @@ mv manifest.json manifest_socket_mode.json
 mv manifest_oauth.json manifest.json
 ```
 
-Replace all instances of `https://PLACEHOLDER.ngrok-free.app` in `manifest.json` with your ngrok URL.
+Replace all instances of `https://YOUR_NGROK_SUBDOMAIN.ngrok-free.app` in `manifest.json` with your ngrok URL.
 
 4. Create a new local dev app:
 
@@ -173,24 +173,30 @@ Replace all instances of `https://PLACEHOLDER.ngrok-free.app` in `manifest.json`
 slack install -E local
 ```
 
-5. Copy the following values into your `.env`. Run `slack app settings` and copy the **Signing Secret**, **Client ID**, and **Client Secret**:
+5. Enable MCP for your app:
+   - Run `slack app settings` to open your app's settings
+   - Navigate to **Agents & AI Apps** in the left-side navigation
+   - Toggle **Model Context Protocol** on
+
+6. Update your `.env` OAuth environment variables:
+   - Run `slack app settings` to open App Settings
+   - Copy **Client ID**, **Client Secret**, and **Signing Secret**
+   - Update the **Slack Redirect URI** with your ngrok URL
 
 ```sh
-SLACK_SIGNING_SECRET=YOUR_SIGNING_SECRET
 SLACK_CLIENT_ID=YOUR_CLIENT_ID
 SLACK_CLIENT_SECRET=YOUR_CLIENT_SECRET
-SLACK_REDIRECT_URI=https://YOUR_NGROK_URL.ngrok-free.app/slack/oauth_redirect
+SLACK_REDIRECT_URI=https://YOUR_NGROK_SUBDOMAIN.ngrok-free.app/slack/oauth_redirect
+SLACK_SIGNING_SECRET=YOUR_SIGNING_SECRET
 ```
 
-Replace `YOUR_NGROK_URL` in `SLACK_REDIRECT_URI` with your ngrok subdomain.
-
-6. Start the app:
+7. Start the app:
 
 ```sh
 slack run app_oauth.py
 ```
 
-7. Click the install URL printed in the terminal to install the app to your workspace via OAuth.
+8. Click the install URL printed in the terminal to install the app to your workspace via OAuth.
 
 </details>
 
@@ -198,7 +204,7 @@ slack run app_oauth.py
 
 #### Terminal
 
-3. Create your Slack app at [api.slack.com/apps/new](https://api.slack.com/apps/new) using [`manifest_oauth.json`](./manifest_oauth.json). Before pasting the manifest, replace all instances of `https://PLACEHOLDER.ngrok-free.app` with your ngrok URL.
+3. Create your Slack app at [api.slack.com/apps/new](https://api.slack.com/apps/new) using [`manifest_oauth.json`](./manifest_oauth.json). Before pasting the manifest, replace all instances of `https://YOUR_NGROK_SUBDOMAIN.ngrok-free.app` with your ngrok URL.
 
 4. Install the app to your workspace and copy the following values into your `.env`:
    - **Signing Secret** — from _Basic Information_
@@ -210,18 +216,23 @@ SLACK_SIGNING_SECRET=YOUR_SIGNING_SECRET
 SLACK_BOT_TOKEN=xoxb-YOUR_BOT_TOKEN
 SLACK_CLIENT_ID=YOUR_CLIENT_ID
 SLACK_CLIENT_SECRET=YOUR_CLIENT_SECRET
-SLACK_REDIRECT_URI=https://YOUR_NGROK_URL.ngrok-free.app/slack/oauth_redirect
+SLACK_REDIRECT_URI=https://YOUR_NGROK_SUBDOMAIN.ngrok-free.app/slack/oauth_redirect
 ```
 
-Replace `YOUR_NGROK_URL` in `SLACK_REDIRECT_URI` with your ngrok subdomain.
+Replace `YOUR_NGROK_SUBDOMAIN` in `SLACK_REDIRECT_URI` with your ngrok subdomain.
 
-5. Start the app:
+5. Enable MCP for your app:
+   - Open your app at [api.slack.com/apps](https://api.slack.com/apps)
+   - Navigate to **Agents & AI Apps** in the left-side navigation
+   - Toggle **Model Context Protocol** on
+
+6. Start the app:
 
 ```sh
 python3 app_oauth.py
 ```
 
-6. Click the install URL printed in the terminal to install the app to your workspace via OAuth.
+7. Click the install URL printed in the terminal to install the app to your workspace via OAuth.
 
 </details>
 
