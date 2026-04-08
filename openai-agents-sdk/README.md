@@ -304,3 +304,19 @@ The `tools` directory contains five IT helpdesk tools that the agent can call du
 ### `/thread_context`
 
 The `store.py` file implements a thread-safe in-memory conversation history store, keyed by channel and thread. This enables multi-turn conversations where Casey remembers previous context within a thread.
+
+## Troubleshooting
+
+### MCP Server connection error: `HTTP error 400 (Bad Request)`
+
+If you see an error like:
+
+```
+Failed to connect to MCP server 'streamable_http: https://mcp.slack.com/mcp': HTTP error 400 (Bad Request)
+```
+
+This means the Slack MCP feature has not been enabled for your app. There is no manifest property for this yet, so it must be toggled on manually:
+
+1. Run `slack app settings` to open your app's settings page (or visit [api.slack.com/apps](https://api.slack.com/apps) and select your app)
+2. Navigate to **Agents & AI Apps** in the left-side navigation
+3. Toggle **Slack Model Context Protocol** on
