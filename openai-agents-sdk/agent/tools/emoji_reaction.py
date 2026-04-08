@@ -33,7 +33,7 @@ async def add_emoji_reaction(
     Args:
         emoji_name: The Slack emoji name without colons (e.g. 'tada', 'wrench', 'pray').
     """
-    deps = wrapper.context.deps
+    deps = wrapper.context
 
     # Skip ~15% of reactions to feel more natural
     if random.random() < 0.15:

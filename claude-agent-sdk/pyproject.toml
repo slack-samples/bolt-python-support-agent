@@ -18,7 +18,7 @@ test = [
 ]
 dev = [
     "bolt-python-support-agent-claude[test]",
-    "ruff==0.15.8",
+    "ruff==0.15.9",
 ]
 
 [tool.setuptools.packages.find]
@@ -29,6 +29,7 @@ include = ["agent*", "listeners*", "thread_context*"]
 [tool.ruff.format]
 
 [tool.pytest.ini_options]
+asyncio_mode = "auto"
 testpaths = ["tests"]
 log_file = "logs/pytest.log"
 log_file_level = "DEBUG"
