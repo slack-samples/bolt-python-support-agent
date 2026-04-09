@@ -34,10 +34,4 @@ Casey also works with the [Slack MCP Server](https://docs.slack.dev/agents-ai/mo
 
 ## Local Development
 
-This repo uses a vendored (pre-release) build of `slack-bolt` from the [bolt-python](https://github.com/slackapi/bolt-python) `main` branch. The `.whl` file lives in `vendor/` and is referenced by each app's `requirements.txt`.
-
-To update the vendored bolt-python to the latest `main`, run the Claude Code slash command:
-
-```
-/project:vendor-bolt
-```
+This repo uses [`slack-bolt`](https://pypi.org/project/slack-bolt/) from PyPI.
