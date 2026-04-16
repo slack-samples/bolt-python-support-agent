@@ -1,6 +1,6 @@
-# Casey: IT Helpdesk Agent (Bolt for Python and Claude Agent SDK)
+# Casey: IT Support Agent (Bolt for Python and Claude Agent SDK)
 
-Meet Casey (it/this/that) — an AI-powered IT helpdesk agent that lives in Slack. Casey can troubleshoot common issues, search knowledge base articles, reset passwords, check system status, and create support tickets, all without leaving the conversation.
+Meet Casey (it/this/that) — an AI-powered IT support agent that lives in Slack. Casey can troubleshoot common issues, search knowledge base articles, reset passwords, check system status, and create support tickets, all without leaving the conversation.
 
 Built with [Bolt for Python](https://docs.slack.dev/tools/bolt-python/) and the [Claude Agent SDK](https://platform.claude.com/docs/en/agent-sdk/overview) using models from [Anthropic](https://www.anthropic.com).
 
@@ -307,7 +307,7 @@ The `casey.py` file configures the Claude Agent SDK with a system prompt, tools 
 
 The `deps.py` file defines the `CaseyDeps` dataclass passed to the agent at runtime, providing access to the Slack client and conversation context.
 
-The `tools` directory contains five IT helpdesk tools defined using the `@tool` decorator from the Claude Agent SDK.
+The `tools` directory contains five IT support tools defined using the `@tool` decorator from the Claude Agent SDK.
 
 ### `/thread_context`
 

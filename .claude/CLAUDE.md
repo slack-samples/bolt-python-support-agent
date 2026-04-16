@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-A monorepo containing three parallel implementations of **Casey**, an AI-powered IT helpdesk agent for Slack built with Bolt for Python. All implementations are functionally identical from the Slack user's perspective but use different AI agent frameworks:
+A monorepo containing three parallel implementations of **Casey**, an AI-powered IT support agent for Slack built with Bolt for Python. All implementations are functionally identical from the Slack user's perspective but use different AI agent frameworks:
 
 - `claude-agent-sdk/` — Built with **Claude Agent SDK**
 - `openai-agents-sdk/` — Built with **OpenAI Agents SDK**
