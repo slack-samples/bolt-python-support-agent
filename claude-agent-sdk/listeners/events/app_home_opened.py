@@ -24,7 +24,11 @@ async def handle_app_home_opened(
                 redirect_uri = os.environ.get("SLACK_REDIRECT_URI", "")
                 install_url = urljoin(redirect_uri, "/slack/install")
 
-        view = build_app_home_view(install_url=install_url, is_connected=is_connected)
+        view = build_app_home_view(
+            install_url=install_url,
+            is_connected=is_connected,
+            bot_user_id=context.bot_user_id,
+        )
         await client.views_publish(user_id=user_id, view=view)
     except Exception as e:
         logger.exception(f"Failed to publish App Home: {e}")

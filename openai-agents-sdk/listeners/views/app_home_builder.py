@@ -28,7 +28,9 @@ CATEGORIES = [
 
 
 def build_app_home_view(
-    install_url: str | None = None, is_connected: bool = False
+    install_url: str | None = None,
+    is_connected: bool = False,
+    bot_user_id: str | None = None,
 ) -> dict:
     """Build the App Home Block Kit view with category buttons.
 
@@ -37,13 +39,15 @@ def build_app_home_view(
             connected and will see a link to install.
         is_connected: When ``True``, the user is connected and the MCP
             status section shows as connected.
+        bot_user_id: The bot's user ID for dynamic mentions.
     """
+    mention = f" with <@{bot_user_id}>" if bot_user_id else ""
     blocks = [
         {
             "type": "header",
             "text": {
                 "type": "plain_text",
-                "text": "Hey there :wave: I'm Casey, your IT helpdesk agent.",
+                "text": "Hey there :wave: I'm your IT helpdesk agent.",
             },
         },
         {
@@ -79,7 +83,7 @@ def build_app_home_view(
             "elements": [
                 {
                     "type": "mrkdwn",
-                    "text": "You can also mention me in any channel with `@Casey` or send me a DM.",
+                    "text": f"You can also mention me in any channel{mention} or send me a DM.",
                 }
             ],
         },
@@ -102,7 +106,7 @@ def build_app_home_view(
                 "elements": [
                     {
                         "type": "mrkdwn",
-                        "text": "Casey has access to search messages, read channels, and more.",
+                        "text": "This agent has access to search messages, read channels, and more.",
                     }
                 ],
             }
@@ -123,7 +127,7 @@ def build_app_home_view(
                 "elements": [
                     {
                         "type": "mrkdwn",
-                        "text": "The Slack MCP Server enables Casey to search messages, read channels, and more.",
+                        "text": "The Slack MCP Server enables this agent to search messages, read channels, and more.",
                     }
                 ],
             }

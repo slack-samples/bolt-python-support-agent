@@ -63,3 +63,21 @@ def test_build_app_home_view_connected():
     ]
     mcp_section = next(t for t in section_texts if "Slack MCP Server" in t)
     assert "connected" in mcp_section
+
+
+def test_build_app_home_view_with_bot_user_id():
+    """bot_user_id provided — context block includes dynamic mention."""
+    view = build_app_home_view(bot_user_id="U0BOT")
+
+    context_blocks = [b for b in view["blocks"] if b["type"] == "context"]
+    mention_text = context_blocks[0]["elements"][0]["text"]
+    assert "<@U0BOT>" in mention_text
+
+
+def test_build_app_home_view_without_bot_user_id():
+    """bot_user_id not provided — context block omits mention."""
+    view = build_app_home_view()
+
+    context_blocks = [b for b in view["blocks"] if b["type"] == "context"]
+    mention_text = context_blocks[0]["elements"][0]["text"]
+    assert "<@" not in mention_text
