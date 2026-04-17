@@ -148,7 +148,7 @@ def build_app_home_view(
                 "elements": [
                     {
                         "type": "mrkdwn",
-                        "text": "The Slack MCP Server enables Casey to search messages, read channels, and more.",
+                        "text": "The Slack MCP Server enables this agent to search messages, read channels, and more.",
                     }
                 ],
             }
