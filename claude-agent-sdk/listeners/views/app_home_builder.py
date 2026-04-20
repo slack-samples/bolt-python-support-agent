@@ -43,7 +43,7 @@ def build_app_home_view(
             "type": "header",
             "text": {
                 "type": "plain_text",
-                "text": "Hey there :wave: I'm Casey, your IT helpdesk agent.",
+                "text": "Hey there :wave: I'm Casey, your IT support agent.",
             },
         },
         {
