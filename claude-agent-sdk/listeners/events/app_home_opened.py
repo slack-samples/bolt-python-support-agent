@@ -2,6 +2,7 @@ import os
 from logging import Logger
 from urllib.parse import urljoin
 
+from slack_bolt.async_app import AsyncSetSuggestedPrompts
 from slack_bolt.context.async_context import AsyncBoltContext
 from slack_sdk.web.async_client import AsyncWebClient
 
@@ -15,7 +16,11 @@ SUGGESTED_PROMPTS = [
 
 
 async def handle_app_home_opened(
-    client: AsyncWebClient, event: dict, context: AsyncBoltContext, logger: Logger
+    client: AsyncWebClient,
+    event: dict,
+    context: AsyncBoltContext,
+    logger: Logger,
+    set_suggested_prompts: AsyncSetSuggestedPrompts,
 ):
     """Handle app_home_opened events.
 
@@ -26,12 +31,10 @@ async def handle_app_home_opened(
     """
     try:
         if event.get("tab") == "messages":
-            await client.assistant_threads_setSuggestedPrompts(
-                channel_id=event["channel"],
+            await set_suggested_prompts(
                 title="How can I help you today?",
                 prompts=SUGGESTED_PROMPTS,
             )
-            # TODO(agent-dm-messages-tab): handle app_context_changed once Bolt supports it
             return
 
         user_id = context.user_id

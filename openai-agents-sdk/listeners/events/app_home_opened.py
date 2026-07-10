@@ -2,7 +2,7 @@ import os
 from logging import Logger
 from urllib.parse import urljoin
 
-from slack_bolt import BoltContext
+from slack_bolt import BoltContext, SetSuggestedPrompts
 from slack_sdk import WebClient
 
 from listeners.views.app_home_builder import build_app_home_view
@@ -15,7 +15,11 @@ SUGGESTED_PROMPTS = [
 
 
 def handle_app_home_opened(
-    client: WebClient, event: dict, context: BoltContext, logger: Logger
+    client: WebClient,
+    event: dict,
+    context: BoltContext,
+    logger: Logger,
+    set_suggested_prompts: SetSuggestedPrompts,
 ):
     """Handle app_home_opened events.
 
@@ -26,12 +30,10 @@ def handle_app_home_opened(
     """
     try:
         if event.get("tab") == "messages":
-            client.assistant_threads_setSuggestedPrompts(
-                channel_id=event["channel"],
+            set_suggested_prompts(
                 title="How can I help you today?",
                 prompts=SUGGESTED_PROMPTS,
             )
-            # TODO(agent-dm-messages-tab): handle app_context_changed once Bolt supports it
             return
 
         user_id = context.user_id
