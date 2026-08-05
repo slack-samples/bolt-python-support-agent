@@ -51,5 +51,5 @@ def handle_app_home_opened(
             bot_user_id=context.bot_user_id,
         )
         client.views_publish(user_id=user_id, view=view)
-    except Exception as e:
-        logger.exception(f"Failed to handle app_home_opened: {e}")
+    except Exception:
+        logger.exception("Failed to handle app_home_opened")
