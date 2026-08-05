@@ -43,5 +43,5 @@ async def handle_issue_submission(
             },
         )
 
-    except Exception as e:
-        logger.exception(f"Failed to handle issue submission: {e}")
+    except Exception:
+        logger.exception("Failed to handle issue submission")
