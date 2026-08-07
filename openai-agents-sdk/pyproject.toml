@@ -6,7 +6,7 @@ dependencies = [
     "slack-sdk==3.43.0",
     "slack-bolt==1.30.0",
     "slack-cli-hooks==0.3.0",
-    "openai-agents==0.18.3",
+    "openai-agents==0.19.3",
     "python-dotenv==1.2.2",
 ]
 
@@ -16,7 +16,7 @@ test = [
 ]
 dev = [
     "bolt-python-support-agent-openai-agentkit[test]",
-    "ruff==0.15.21",
+    "ruff==0.16.1",
 ]
 
 [tool.setuptools.packages.find]

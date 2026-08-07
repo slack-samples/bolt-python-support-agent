@@ -17,5 +17,5 @@ async def handle_issue_button(
         trigger_id = body["trigger_id"]
         modal = build_issue_modal(category)
         await client.views_open(trigger_id=trigger_id, view=modal)
-    except Exception as e:
-        logger.exception(f"Failed to open issue modal: {e}")
+    except Exception:
+        logger.exception("Failed to open issue modal")
