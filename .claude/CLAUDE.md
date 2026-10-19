@@ -38,7 +38,7 @@ openai-agents-sdk/   # OpenAI Agents SDK implementation
 pydantic-ai/         # Pydantic AI implementation
 ```
 
-CI runs ruff lint/format checks and tests against all directories via a matrix strategy in `.github/workflows/ci.yml`. Dependabot monitors `requirements.txt` in all directories independently.
+CI runs ruff lint/format checks and tests against all directories via a matrix strategy in `.github/workflows/ci.yml`. Dependabot monitors `pyproject.toml` in all directories independently.
 
 ## Architecture (shared across all implementations)
 
