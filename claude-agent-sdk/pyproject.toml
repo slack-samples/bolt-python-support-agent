@@ -8,7 +8,7 @@ dependencies = [
     "slack-cli-hooks==0.3.0",
     "claude-agent-sdk==0.2.165",
     "aiohttp==3.14.5",
-    "python-dotenv==1.2.3",
+    "python-dotenv==1.2.4",
 ]
 
 [project.optional-dependencies]
