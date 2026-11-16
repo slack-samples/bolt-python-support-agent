@@ -73,3 +73,65 @@ class TestMessage:
         fake_run_agent = await self.handle("what did you find?", user="U456")
 
         fake_run_agent.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_stores_the_new_session_under_the_person_who_replied(self):
+        session_store.set_session("C123", "1.0", "U123", "session-1")
+
+        with patch(
+            "listeners.events.message.run_casey_agent",
+            AsyncMock(return_value=("Hi", "session-2")),
+        ):
+            await handle_message(
+                client=self.fake_client,
+                context=self.fake_context,
+                event={
+                    "channel_type": "channel",
+                    "text": "and then?",
+                    "thread_ts": "1.0",
+                    "ts": "2.0",
+                    "user": "U123",
+                },
+                logger=test_logger,
+                say=AsyncMock(),
+                say_stream=AsyncMock(
+                    return_value=Mock(append=AsyncMock(), stop=AsyncMock())
+                ),
+                set_status=AsyncMock(),
+            )
+
+        assert session_store.get_session("C123", "1.0", "U123") == "session-2"
+        assert session_store.get_session("C123", "1.0", "U456") is None
+
+    @pytest.mark.asyncio
+    async def test_stores_an_issue_submission_session_under_the_submitter(self):
+        self.fake_context.channel_id = "D123"
+        self.fake_context.user_id = "UBOT"
+
+        with patch(
+            "listeners.events.message.run_casey_agent",
+            AsyncMock(return_value=("Hi", "session-2")),
+        ):
+            await handle_message(
+                client=self.fake_client,
+                context=self.fake_context,
+                event={
+                    "bot_id": "B123",
+                    "channel_type": "im",
+                    "metadata": {
+                        "event_type": "issue_submission",
+                        "event_payload": {"user_id": "U789"},
+                    },
+                    "text": "*Category:* Hardware",
+                    "ts": "5.0",
+                },
+                logger=test_logger,
+                say=AsyncMock(),
+                say_stream=AsyncMock(
+                    return_value=Mock(append=AsyncMock(), stop=AsyncMock())
+                ),
+                set_status=AsyncMock(),
+            )
+
+        assert session_store.get_session("D123", "5.0", "U789") == "session-2"
+        assert session_store.get_session("D123", "5.0", "UBOT") is None
