@@ -43,7 +43,9 @@ async def handle_message(
         if f"<@{context.bot_user_id}>" in event.get("text", ""):
             return
         # Channel thread replies are handled only if the bot is already engaged
-        session = session_store.get_session(context.channel_id, event["thread_ts"])
+        session = session_store.get_session(
+            context.channel_id, event["thread_ts"], context.user_id
+        )
         if session is None:
             return
     else:
@@ -55,8 +57,15 @@ async def handle_message(
         text = event.get("text", "")
         thread_ts = event.get("thread_ts") or event["ts"]
 
+        # For issue submissions the bot posted the message, so the real
+        # user_id comes from the metadata rather than the event context.
+        if is_issue_submission:
+            user_id = event["metadata"]["event_payload"]["user_id"]
+        else:
+            user_id = context.user_id
+
         # Get session ID for conversation context
-        existing_session_id = session_store.get_session(channel_id, thread_ts)
+        existing_session_id = session_store.get_session(channel_id, thread_ts, user_id)
 
         # Add eyes reaction only to the first message (DMs only — channel
         # threads already have the reaction from the initial app_mention)
@@ -79,13 +88,6 @@ async def handle_message(
             ],
         )
 
-        # For issue submissions the bot posted the message, so the real
-        # user_id comes from the metadata rather than the event context.
-        if is_issue_submission:
-            user_id = event["metadata"]["event_payload"]["user_id"]
-        else:
-            user_id = context.user_id
-
         # Run the agent with deps for tool access
         deps = CaseyDeps(
             client=client,
@@ -107,7 +109,7 @@ async def handle_message(
 
         # Store session ID for future context
         if new_session_id:
-            session_store.set_session(channel_id, thread_ts, new_session_id)
+            session_store.set_session(channel_id, thread_ts, user_id, new_session_id)
 
     except Exception as e:
         logger.exception("Failed to handle message")
