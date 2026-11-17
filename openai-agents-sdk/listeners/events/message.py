@@ -39,9 +39,10 @@ def handle_message(
     elif is_thread_reply:
         if f"<@{context.bot_user_id}>" in event.get("text", ""):
             return
-        # Channel thread replies are handled only if the bot is already engaged
-        history = conversation_store.get_history(context.channel_id, event["thread_ts"])
-        if history is None:
+        own_history = conversation_store.get_history(
+            context.channel_id, event["thread_ts"], context.user_id
+        )
+        if own_history is None:
             return
     else:
         # Top-level channel messages are handled by app_mentioned
@@ -60,7 +61,7 @@ def handle_message(
             user_id = context.user_id
 
         # Get conversation history
-        history = conversation_store.get_history(channel_id, thread_ts)
+        history = conversation_store.get_history(channel_id, thread_ts, user_id)
 
         # Add eyes reaction only to the first message (DMs only — channel
         # threads already have the reaction from the initial app_mention)
@@ -107,7 +108,9 @@ def handle_message(
         streamer.stop(blocks=feedback_blocks)
 
         # Store conversation history
-        conversation_store.set_history(channel_id, thread_ts, result.to_input_list())
+        conversation_store.set_history(
+            channel_id, thread_ts, user_id, result.to_input_list()
+        )
 
     except Exception as e:
         logger.exception("Failed to handle message")

@@ -56,7 +56,7 @@ def handle_app_mentioned(
         )
 
         # Get conversation history
-        history = conversation_store.get_history(channel_id, thread_ts)
+        history = conversation_store.get_history(channel_id, thread_ts, context.user_id)
 
         # Run the agent
         deps = CaseyDeps(
@@ -76,7 +76,9 @@ def handle_app_mentioned(
         streamer.stop(blocks=feedback_blocks)
 
         # Store conversation history
-        conversation_store.set_history(channel_id, thread_ts, result.all_messages())
+        conversation_store.set_history(
+            channel_id, thread_ts, context.user_id, result.all_messages()
+        )
 
     except Exception as e:
         logger.exception("Failed to handle app mention")
