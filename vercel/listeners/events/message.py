@@ -8,7 +8,7 @@ from slack_sdk.web.async_client import AsyncWebClient
 
 from agent import CaseyDeps, run_casey_agent
 from listeners.views.feedback_builder import build_feedback_blocks
-from thread_context import session_store
+from thread_context import conversation_store
 
 
 async def handle_message(
@@ -42,10 +42,10 @@ async def handle_message(
     elif is_thread_reply:
         if f"<@{context.bot_user_id}>" in event.get("text", ""):
             return
-        own_session = session_store.get_session(
+        own_history = await conversation_store.get_history(
             context.channel_id, event["thread_ts"], context.user_id
         )
-        if own_session is None:
+        if own_history is None:
             return
     else:
         # Top-level channel messages are handled by app_mentioned
@@ -63,12 +63,12 @@ async def handle_message(
         else:
             user_id = context.user_id
 
-        # Get session ID for conversation context
-        existing_session_id = session_store.get_session(channel_id, thread_ts, user_id)
+        # Get conversation history
+        history = await conversation_store.get_history(channel_id, thread_ts, user_id)
 
         # Add eyes reaction only to the first message (DMs only — channel
         # threads already have the reaction from the initial app_mention)
-        if is_dm and not existing_session_id:
+        if is_dm and history is None:
             await client.reactions_add(
                 channel=channel_id,
                 timestamp=event["ts"],
@@ -96,8 +96,8 @@ async def handle_message(
             message_ts=event["ts"],
             user_token=context.user_token,
         )
-        response_text, new_session_id = await run_casey_agent(
-            text, session_id=existing_session_id, deps=deps
+        response_text, messages = await run_casey_agent(
+            text, deps, message_history=history
         )
 
         # Stream response in thread with feedback buttons
@@ -106,9 +106,8 @@ async def handle_message(
         feedback_blocks = build_feedback_blocks()
         await streamer.stop(blocks=feedback_blocks)
 
-        # Store session ID for future context
-        if new_session_id:
-            session_store.set_session(channel_id, thread_ts, user_id, new_session_id)
+        # Store conversation history
+        await conversation_store.set_history(channel_id, thread_ts, user_id, messages)
 
     except Exception as e:
         logger.exception("Failed to handle message")
