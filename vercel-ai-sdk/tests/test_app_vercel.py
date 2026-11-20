@@ -1,15 +1,20 @@
+import asyncio
 import importlib
 import json
+import logging
 import time
 from unittest.mock import AsyncMock, patch
 from urllib.parse import quote
 
 import pytest
 from slack_bolt.context.async_context import AsyncBoltContext
+from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_sdk.signature import SignatureVerifier
 from vercel.blob import BlobNotFoundError
 
 from listeners.events.message import handle_message
+
+test_logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope="module")
@@ -214,3 +219,31 @@ class TestAppVercel:
         assert response["status"] == 200
         fake_start.assert_called_once()
         assert fake_start.call_args.kwargs["function"] == handle_message
+
+
+class TestWaitUntilLazyListenerRunner:
+    @pytest.fixture(autouse=True)
+    def setup(self, app_vercel):
+        self.runner = app_vercel.WaitUntilLazyListenerRunner(test_logger)
+        self.request = AsyncBoltRequest(body="{}", headers={})
+        self.finished = asyncio.Event()
+
+    async def lazy_function(self):
+        self.finished.set()
+
+    @pytest.mark.asyncio
+    async def test_runner_hands_task_to_wait_until(self):
+        with patch("app_vercel.wait_until") as fake_wait_until:
+            self.runner.start(function=self.lazy_function, request=self.request)
+
+        fake_wait_until.assert_called_once()
+        task = fake_wait_until.call_args.args[0]
+        assert isinstance(task, asyncio.Task)
+        await task
+        assert self.finished.is_set()
+
+    @pytest.mark.asyncio
+    async def test_runner_runs_without_vercel_context(self):
+        self.runner.start(function=self.lazy_function, request=self.request)
+
+        await asyncio.wait_for(self.finished.wait(), timeout=1)
